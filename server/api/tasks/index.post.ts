@@ -1,11 +1,30 @@
+import type { H3Event } from 'h3'
 import { getServerSupabase } from '~/server/utils/supabase'
-import { requireUser } from '~/server/utils/auth'
 
 const allowedStatuses = ['todo', 'in_progress', 'done'] as const
 type TaskStatus = typeof allowedStatuses[number]
 
+const getOptionalUserId = async (event: H3Event) => {
+  const authorization = getHeader(event, 'authorization')
+  if (!authorization?.startsWith('Bearer ')) {
+    return null
+  }
+
+  const token = authorization.slice('Bearer '.length).trim()
+  if (!token) {
+    return null
+  }
+
+  const supabase = getServerSupabase()
+  const { data, error } = await supabase.auth.getUser(token)
+  if (error || !data.user) {
+    return null
+  }
+
+  return data.user.id
+}
+
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
   const body = await readBody<{ title?: string; description?: string; dueDateTime?: string; status?: TaskStatus }>(event)
 
   const title = body.title?.trim()
@@ -22,16 +41,23 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'status must be todo, in_progress, or done' })
   }
 
+  const userId = await getOptionalUserId(event)
+
   const supabase = getServerSupabase()
+  const insertPayload: Record<string, unknown> = {
+    title,
+    description: body.description?.trim() ?? '',
+    status,
+    due_date_time: body.dueDateTime,
+  }
+
+  if (userId) {
+    insertPayload.user_id = userId
+  }
+
   const { data, error } = await supabase
     .from('tasks')
-    .insert({
-      user_id: user.id,
-      title,
-      description: body.description?.trim() ?? '',
-      status,
-      due_date_time: body.dueDateTime,
-    })
+    .insert(insertPayload)
     .select('id, title, description, status, due_date_time, created_at, updated_at')
     .single()
 

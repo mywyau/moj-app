@@ -73,10 +73,13 @@ const loadTasks = async () => {
 const createTask = async () => {
   errorMessage.value = ''
   try {
-    const headers = await getAuthHeaders()
+    const headers = token.value ? { Authorization: `Bearer ${token.value}` } : undefined
     await $fetch('/api/tasks', { method: 'POST', headers, body: newTask.value })
     newTask.value = { title: '', description: '', dueDateTime: '', status: 'todo' }
-    await loadTasks()
+
+    if (token.value) {
+      await loadTasks()
+    }
   }
   catch (error: any) {
     errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to create task'
