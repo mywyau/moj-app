@@ -1,10 +1,13 @@
-import { getTasks, type TaskStatus } from '../_mock-store'
+import { getServerSupabase } from '~/server/utils/supabase'
+import { requireUser } from '~/server/utils/auth'
 
-const allowedStatuses: TaskStatus[] = ['todo', 'in_progress', 'done']
+const allowedStatuses = ['todo', 'in_progress', 'done'] as const
+type TaskStatus = typeof allowedStatuses[number]
 
 export default defineEventHandler(async (event) => {
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id) || id <= 0) {
+  const user = await requireUser(event)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid task id' })
   }
 
@@ -13,13 +16,32 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'status must be todo, in_progress, or done' })
   }
 
-  const task = getTasks().find(item => item.id === id)
-  if (!task) {
+  const supabase = getServerSupabase()
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({ status: body.status })
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select('id, title, description, status, due_date_time, created_at, updated_at')
+    .maybeSingle()
+
+  if (error) {
+    throw createError({ statusCode: 500, statusMessage: error.message })
+  }
+
+  if (!data) {
     throw createError({ statusCode: 404, statusMessage: 'Task not found' })
   }
 
-  task.status = body.status
-  task.updatedAt = new Date().toISOString()
-
-  return { task }
+  return {
+    task: {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      status: data.status,
+      dueDateTime: data.due_date_time,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    },
+  }
 })

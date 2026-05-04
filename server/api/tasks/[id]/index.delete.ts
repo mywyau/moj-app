@@ -1,20 +1,24 @@
-import { getTasks } from '../_mock-store'
+import { getServerSupabase } from '~/server/utils/supabase'
+import { requireUser } from '~/server/utils/auth'
 
-export default defineEventHandler((event) => {
-  const id = Number(getRouterParam(event, 'id'))
+export default defineEventHandler(async (event) => {
+  const user = await requireUser(event)
+  const id = getRouterParam(event, 'id')
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!id) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid task id' })
   }
 
-  const tasks = getTasks()
-  const taskIndex = tasks.findIndex(item => item.id === id)
+  const supabase = getServerSupabase()
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id)
 
-  if (taskIndex < 0) {
-    throw createError({ statusCode: 404, statusMessage: 'Task not found' })
+  if (error) {
+    throw createError({ statusCode: 500, statusMessage: error.message })
   }
-
-  tasks.splice(taskIndex, 1)
 
   return { ok: true }
 })
