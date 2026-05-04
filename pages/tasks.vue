@@ -7,11 +7,12 @@ interface Task {
   dueDateTime: string
 }
 
-const supabase = useSupabaseClient()
-const token = ref('')
 const tasks = ref<Task[]>([])
 const loading = ref(false)
+const saving = ref(false)
 const errorMessage = ref('')
+
+const editingTaskId = ref<string | null>(null)
 
 const newTask = ref({
   title: '',
@@ -20,46 +21,23 @@ const newTask = ref({
   status: 'todo' as Task['status'],
 })
 
-const saveToken = () => {
-  localStorage.setItem('sb_access_token', token.value)
-}
-
-const refreshTokenFromSession = async () => {
-  const { data } = await supabase.auth.getSession()
-  const sessionToken = data.session?.access_token ?? ''
-
-  if (sessionToken) {
-    token.value = sessionToken
-    saveToken()
-  }
-}
-
-const getAuthHeaders = async () => {
-  if (!token.value) {
-    token.value = localStorage.getItem('sb_access_token') ?? ''
-  }
-
-  await refreshTokenFromSession()
-
-  if (!token.value) {
-    throw createError({ statusCode: 401, statusMessage: 'Please sign in on /auth before managing tasks.' })
-  }
-
-  return { Authorization: `Bearer ${token.value}` }
-}
+const editTask = ref({
+  title: '',
+  description: '',
+  dueDateTime: '',
+  status: 'todo' as Task['status'],
+})
 
 onMounted(async () => {
-  token.value = localStorage.getItem('sb_access_token') ?? ''
-  await refreshTokenFromSession()
   await loadTasks()
 })
 
 const loadTasks = async () => {
   loading.value = true
   errorMessage.value = ''
+
   try {
-    const headers = await getAuthHeaders()
-    const response = await $fetch<{ tasks: Task[] }>('/api/tasks', { headers })
+    const response = await $fetch<{ tasks: Task[] }>('/api/tasks')
     tasks.value = response.tasks
   }
   catch (error: any) {
@@ -72,25 +50,100 @@ const loadTasks = async () => {
 
 const createTask = async () => {
   errorMessage.value = ''
-  try {
-    const headers = token.value ? { Authorization: `Bearer ${token.value}` } : undefined
-    await $fetch('/api/tasks', { method: 'POST', headers, body: newTask.value })
-    newTask.value = { title: '', description: '', dueDateTime: '', status: 'todo' }
 
-    if (token.value) {
-      await loadTasks()
+  if (!newTask.value.title.trim()) {
+    errorMessage.value = 'Task title is required'
+    return
+  }
+
+  saving.value = true
+
+  try {
+    await $fetch('/api/tasks', {
+      method: 'POST',
+      body: {
+        title: newTask.value.title.trim(),
+        description: newTask.value.description.trim(),
+        dueDateTime: newTask.value.dueDateTime,
+        status: newTask.value.status,
+      },
+    })
+
+    newTask.value = {
+      title: '',
+      description: '',
+      dueDateTime: '',
+      status: 'todo',
     }
+
+    await loadTasks()
   }
   catch (error: any) {
     errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to create task'
+  }
+  finally {
+    saving.value = false
+  }
+}
+
+const startEditing = (task: Task) => {
+  editingTaskId.value = task.id
+
+  editTask.value = {
+    title: task.title,
+    description: task.description,
+    dueDateTime: task.dueDateTime,
+    status: task.status,
+  }
+}
+
+const cancelEditing = () => {
+  editingTaskId.value = null
+
+  editTask.value = {
+    title: '',
+    description: '',
+    dueDateTime: '',
+    status: 'todo',
+  }
+}
+
+const updateTask = async (taskId: string) => {
+  errorMessage.value = ''
+
+  if (!editTask.value.title.trim()) {
+    errorMessage.value = 'Task title is required'
+    return
+  }
+
+  try {
+    await $fetch(`/api/tasks/${taskId}`, {
+      method: 'PATCH',
+      body: {
+        title: editTask.value.title.trim(),
+        description: editTask.value.description.trim(),
+        dueDateTime: editTask.value.dueDateTime,
+        status: editTask.value.status,
+      },
+    })
+
+    cancelEditing()
+    await loadTasks()
+  }
+  catch (error: any) {
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to update task'
   }
 }
 
 const updateStatus = async (task: Task, status: Task['status']) => {
   errorMessage.value = ''
+
   try {
-    const headers = await getAuthHeaders()
-    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', headers, body: { status } })
+    await $fetch(`/api/tasks/${task.id}`, {
+      method: 'PATCH',
+      body: { status },
+    })
+
     task.status = status
   }
   catch (error: any) {
@@ -100,70 +153,200 @@ const updateStatus = async (task: Task, status: Task['status']) => {
 
 const deleteTask = async (id: string) => {
   errorMessage.value = ''
+
   try {
-    const headers = await getAuthHeaders()
-    await $fetch(`/api/tasks/${id}`, { method: 'DELETE', headers })
+    await $fetch(`/api/tasks/${id}`, {
+      method: 'DELETE',
+    })
+
     tasks.value = tasks.value.filter(task => task.id !== id)
   }
   catch (error: any) {
     errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to delete task'
   }
 }
+
+const formatDueDate = (dueDateTime: string) => {
+  if (!dueDateTime) return 'No due date'
+
+  return new Date(dueDateTime).toLocaleString()
+}
 </script>
 
 <template>
   <main class="mx-auto max-w-5xl min-h-screen p-8 space-y-8">
     <header>
-      <h1 class="text-3xl font-bold">Caseworker Tasks</h1>
-      <p class="text-gray-600">Create, track, and complete casework tasks.</p>
+      <h1 class="text-3xl font-bold">Todo List</h1>
+      <p class="text-gray-600">
+        Create, edit, complete, and delete todos.
+      </p>
     </header>
 
     <section class="rounded-lg border p-4 space-y-3">
-      <label class="mb-2 block text-sm font-medium">Access token (Bearer)</label>
-      <textarea v-model="token" rows="3" class="w-full rounded border px-3 py-2" />
-      <div class="mt-2 flex gap-2">
-        <button class="rounded bg-black px-4 py-2 text-white" @click="loadTasks">Load tasks</button>
-        <button class="rounded bg-gray-500 px-4 py-2 text-white" @click="saveToken">Save token</button>
-      </div>
-    </section>
+      <h2 class="text-xl font-semibold">Create todo</h2>
 
-    <section class="rounded-lg border p-4 space-y-3">
-      <h2 class="text-xl font-semibold">Create task</h2>
-      <p v-if="errorMessage" class="text-sm text-red-600">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="text-sm text-red-600">
+        {{ errorMessage }}
+      </p>
+
       <div class="grid gap-3 sm:grid-cols-2">
-        <input v-model="newTask.title" class="rounded border px-3 py-2" placeholder="Task title" />
-        <input v-model="newTask.dueDateTime" class="rounded border px-3 py-2" type="datetime-local" />
+        <input
+          v-model="newTask.title"
+          class="rounded border px-3 py-2"
+          placeholder="Todo title"
+        />
+
+        <input
+          v-model="newTask.dueDateTime"
+          class="rounded border px-3 py-2"
+          type="datetime-local"
+        />
       </div>
-      <textarea v-model="newTask.description" rows="3" class="w-full rounded border px-3 py-2" placeholder="Description (optional)" />
-      <button class="rounded bg-blue-600 px-4 py-2 text-white" @click="createTask">Create task</button>
+
+      <textarea
+        v-model="newTask.description"
+        rows="3"
+        class="w-full rounded border px-3 py-2"
+        placeholder="Description optional"
+      />
+
+      <select
+        v-model="newTask.status"
+        class="rounded border px-3 py-2"
+      >
+        <option value="todo">To do</option>
+        <option value="in_progress">In progress</option>
+        <option value="done">Done</option>
+      </select>
+
+      <div>
+        <button
+          class="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+          :disabled="saving"
+          @click="createTask"
+        >
+          {{ saving ? 'Creating...' : 'Create todo' }}
+        </button>
+      </div>
     </section>
 
     <section class="rounded-lg border p-4">
       <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-xl font-semibold">All tasks</h2>
-        <button class="rounded bg-gray-900 px-3 py-1 text-white" @click="loadTasks">Refresh</button>
+        <h2 class="text-xl font-semibold">All todos</h2>
+
+        <button
+          class="rounded bg-gray-900 px-3 py-1 text-white"
+          @click="loadTasks"
+        >
+          Refresh
+        </button>
       </div>
-      <p v-if="loading" class="text-sm text-gray-500">Loading tasks...</p>
+
+      <p v-if="loading" class="text-sm text-gray-500">
+        Loading todos...
+      </p>
+
       <ul v-else-if="tasks.length" class="space-y-3">
-        <li v-for="task in tasks" :key="task.id" class="rounded border p-3">
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 class="font-semibold">{{ task.title }}</h3>
-              <p class="text-sm text-gray-700">{{ task.description || 'No description provided.' }}</p>
-              <p class="mt-1 text-xs text-gray-500">Due: {{ new Date(task.dueDateTime).toLocaleString() }}</p>
+        <li
+          v-for="task in tasks"
+          :key="task.id"
+          class="rounded border p-3"
+        >
+          <div v-if="editingTaskId === task.id" class="space-y-3">
+            <div class="grid gap-3 sm:grid-cols-2">
+              <input
+                v-model="editTask.title"
+                class="rounded border px-3 py-2"
+                placeholder="Todo title"
+              />
+
+              <input
+                v-model="editTask.dueDateTime"
+                class="rounded border px-3 py-2"
+                type="datetime-local"
+              />
             </div>
+
+            <textarea
+              v-model="editTask.description"
+              rows="3"
+              class="w-full rounded border px-3 py-2"
+              placeholder="Description optional"
+            />
+
+            <select
+              v-model="editTask.status"
+              class="rounded border px-3 py-2"
+            >
+              <option value="todo">To do</option>
+              <option value="in_progress">In progress</option>
+              <option value="done">Done</option>
+            </select>
+
+            <div class="flex gap-2">
+              <button
+                class="rounded bg-green-600 px-3 py-1 text-white"
+                @click="updateTask(task.id)"
+              >
+                Save
+              </button>
+
+              <button
+                class="rounded bg-gray-500 px-3 py-1 text-white"
+                @click="cancelEditing"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <div v-else class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 class="font-semibold">
+                {{ task.title }}
+              </h3>
+
+              <p class="text-sm text-gray-700">
+                {{ task.description || 'No description provided.' }}
+              </p>
+
+              <p class="mt-1 text-xs text-gray-500">
+                Due: {{ formatDueDate(task.dueDateTime) }}
+              </p>
+            </div>
+
             <div class="flex items-center gap-2">
-              <select :value="task.status" class="rounded border px-2 py-1" @change="updateStatus(task, ($event.target as HTMLSelectElement).value as Task['status'])">
+              <select
+                :value="task.status"
+                class="rounded border px-2 py-1"
+                @change="updateStatus(task, ($event.target as HTMLSelectElement).value as Task['status'])"
+              >
                 <option value="todo">To do</option>
                 <option value="in_progress">In progress</option>
                 <option value="done">Done</option>
               </select>
-              <button class="rounded bg-red-600 px-3 py-1 text-white" @click="deleteTask(task.id)">Delete</button>
+
+              <button
+                class="rounded bg-gray-700 px-3 py-1 text-white"
+                @click="startEditing(task)"
+              >
+                Edit
+              </button>
+
+              <button
+                class="rounded bg-red-600 px-3 py-1 text-white"
+                @click="deleteTask(task.id)"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </li>
       </ul>
-      <p v-else class="text-sm text-gray-600">No tasks yet.</p>
+
+      <p v-else class="text-sm text-gray-600">
+        No todos yet.
+      </p>
     </section>
   </main>
 </template>

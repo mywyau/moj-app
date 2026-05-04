@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid task id',
+      statusMessage: 'task id is required',
     })
   }
 
@@ -34,11 +34,11 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      ok: true,
-      deletedId: id,
+      deleted: true,
+      id,
     }
-  } catch (error) {
-    if (error && typeof error === 'object' && 'statusCode' in error) {
+  } catch (error: any) {
+    if (error?.statusCode) {
       throw error
     }
 

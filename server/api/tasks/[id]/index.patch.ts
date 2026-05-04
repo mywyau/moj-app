@@ -4,52 +4,110 @@ import {
   getRouterParam,
   readBody,
 } from 'h3'
+
 import { db } from '~/server/db/db'
-import { requireUser } from '~/server/utils/auth'
 
 const allowedStatuses = ['todo', 'in_progress', 'done'] as const
 type TaskStatus = typeof allowedStatuses[number]
 
-type TaskRow = {
+type UpdateTaskBody = {
+  title?: string
+  description?: string
+  dueDateTime?: string | null
+  status?: string
+}
+
+type DbTask = {
   id: string
   title: string
   description: string | null
   status: TaskStatus
-  due_date_time: string
+  due_date_time: string | null
   created_at: string
   updated_at: string
 }
 
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
-
   const id = getRouterParam(event, 'id')
 
   if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid task id',
+      statusMessage: 'task id is required',
     })
   }
 
-  const body = await readBody<{ status?: TaskStatus }>(event)
+  const body = await readBody<UpdateTaskBody>(event)
 
-  if (!body.status || !allowedStatuses.includes(body.status)) {
+  const updates: string[] = []
+  const values: unknown[] = []
+  let paramIndex = 1
+
+  if (body.title !== undefined) {
+    const title = body.title.trim()
+
+    if (!title) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'title cannot be empty',
+      })
+    }
+
+    updates.push(`title = $${paramIndex}`)
+    values.push(title)
+    paramIndex++
+  }
+
+  if (body.description !== undefined) {
+    updates.push(`description = $${paramIndex}`)
+    values.push(body.description.trim())
+    paramIndex++
+  }
+
+  if (body.status !== undefined) {
+    if (!allowedStatuses.includes(body.status as TaskStatus)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'status must be todo, in_progress, or done',
+      })
+    }
+
+    updates.push(`status = $${paramIndex}`)
+    values.push(body.status)
+    paramIndex++
+  }
+
+  if (body.dueDateTime !== undefined) {
+    const dueDateTime = body.dueDateTime?.trim() || null
+
+    if (dueDateTime && Number.isNaN(Date.parse(dueDateTime))) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'dueDateTime must be a valid date string',
+      })
+    }
+
+    updates.push(`due_date_time = $${paramIndex}`)
+    values.push(dueDateTime)
+    paramIndex++
+  }
+
+  if (updates.length === 0) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'status must be todo, in_progress, or done',
+      statusMessage: 'No fields provided to update',
     })
   }
 
+  updates.push('updated_at = now()')
+  values.push(id)
+
   try {
-    const result = await db.query<TaskRow>(
+    const result = await db.query<DbTask>(
       `
         update tasks
-        set
-          status = $1,
-          updated_at = now()
-        where id = $2
-          and user_id = $3
+        set ${updates.join(', ')}
+        where id = $${paramIndex}
         returning
           id,
           title,
@@ -59,39 +117,39 @@ export default defineEventHandler(async (event) => {
           created_at,
           updated_at
       `,
-      [body.status, id, user.id],
+      values,
     )
 
-    const data = result.rows[0]
-
-    if (!data) {
+    if (result.rowCount === 0) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Task not found',
       })
     }
 
+    const task = result.rows[0]
+
     return {
       task: {
-        id: data.id,
-        title: data.title,
-        description: data.description ?? '',
-        status: data.status,
-        dueDateTime: data.due_date_time,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: task.id,
+        title: task.title,
+        description: task.description ?? '',
+        status: task.status,
+        dueDateTime: task.due_date_time ?? '',
+        createdAt: task.created_at,
+        updatedAt: task.updated_at,
       },
     }
-  } catch (error) {
-    if (error && typeof error === 'object' && 'statusCode' in error) {
+  } catch (error: any) {
+    if (error?.statusCode) {
       throw error
     }
 
-    console.error('Failed to update task status', error)
+    console.error('Failed to update task', error)
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to update task status',
+      statusMessage: 'Failed to update task',
     })
   }
 })

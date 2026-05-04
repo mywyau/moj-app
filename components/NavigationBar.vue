@@ -73,13 +73,13 @@ onBeforeUnmount(() => {
       </NuxtLink>
 
       <div ref="menuRoot" class="relative">
-        <button type="button" class="menu-btn" @click.stop="toggleMenu" aria-label="Open account menu"
+        <!-- <button type="button" class="menu-btn" @click.stop="toggleMenu" aria-label="Open account menu"
           :aria-expanded="menuOpen ? 'true' : 'false'">
           ☰
-        </button>
+        </button> -->
 
-        <div v-if="menuOpen" class="menu-panel">
-          <template>
+        <!-- <div v-if="menuOpen" class="menu-panel"> -->
+          <!-- <template>
             <NuxtLink to="/account"
               class="w-full flex items-center rounded-xl px-3 py-2 text-sm text-black hover:bg-black/5 transition"
               @click="closeMenu">
@@ -101,7 +101,7 @@ onBeforeUnmount(() => {
                 Upgrade
               </span>
             </NuxtLink>
-          </template>
+          </template> -->
 
           <!-- <template v-else>
             <button type="button"
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
               Login
             </button>
           </template> -->
-        </div>
+        <!-- </div> -->
       </div>
     </div>
 

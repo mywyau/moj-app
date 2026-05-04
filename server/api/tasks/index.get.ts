@@ -2,22 +2,20 @@ import {
   createError,
   defineEventHandler,
 } from 'h3'
+
 import { db } from '~/server/db/db'
-import { requireUser } from '~/server/utils/auth'
 
 type DbTask = {
   id: string
   title: string
   description: string | null
   status: 'todo' | 'in_progress' | 'done'
-  due_date_time: string
+  due_date_time: string | null
   created_at: string
   updated_at: string
 }
 
-export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
-
+export default defineEventHandler(async () => {
   try {
     const result = await db.query<DbTask>(
       `
@@ -30,10 +28,8 @@ export default defineEventHandler(async (event) => {
           created_at,
           updated_at
         from tasks
-        where user_id = $1
-        order by due_date_time asc
+        order by due_date_time asc nulls last, created_at desc
       `,
-      [user.id],
     )
 
     const tasks = result.rows.map((task) => ({
@@ -41,7 +37,7 @@ export default defineEventHandler(async (event) => {
       title: task.title,
       description: task.description ?? '',
       status: task.status,
-      dueDateTime: task.due_date_time,
+      dueDateTime: task.due_date_time ?? '',
       createdAt: task.created_at,
       updatedAt: task.updated_at,
     }))

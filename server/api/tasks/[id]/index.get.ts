@@ -3,22 +3,20 @@ import {
   defineEventHandler,
   getRouterParam,
 } from 'h3'
+
 import { db } from '~/server/db/db'
-import { requireUser } from '~/server/utils/auth'
 
 type TaskRow = {
   id: string
   title: string
   description: string | null
   status: 'todo' | 'in_progress' | 'done'
-  due_date_time: string
+  due_date_time: string | null
   created_at: string
   updated_at: string
 }
 
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
-
   const id = getRouterParam(event, 'id')
 
   if (!id) {
@@ -41,10 +39,9 @@ export default defineEventHandler(async (event) => {
           updated_at
         from tasks
         where id = $1
-          and user_id = $2
         limit 1
       `,
-      [id, user.id],
+      [id],
     )
 
     const data = result.rows[0]
@@ -62,7 +59,7 @@ export default defineEventHandler(async (event) => {
         title: data.title,
         description: data.description ?? '',
         status: data.status,
-        dueDateTime: data.due_date_time,
+        dueDateTime: data.due_date_time ?? '',
         createdAt: data.created_at,
         updatedAt: data.updated_at,
       },

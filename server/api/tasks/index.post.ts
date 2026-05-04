@@ -1,65 +1,33 @@
-import type { H3Event } from 'h3'
 import {
   createError,
   defineEventHandler,
-  getHeader,
   readBody,
 } from 'h3'
-import jwt from 'jsonwebtoken'
+
 import { db } from '~/server/db/db'
 
 const allowedStatuses = ['todo', 'in_progress', 'done'] as const
 type TaskStatus = typeof allowedStatuses[number]
 
-type SupabaseJwtPayload = {
-  sub: string
-  email?: string
-  role?: string
-  aud?: string
-  exp?: number
+type CreateTaskBody = {
+  title?: string
+  description?: string
+  dueDateTime?: string
+  status?: string
 }
 
-const getOptionalUserId = async (event: H3Event): Promise<string | null> => {
-  const authorization = getHeader(event, 'authorization')
-
-  if (!authorization?.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authorization.slice('Bearer '.length).trim()
-
-  if (!token) {
-    return null
-  }
-
-  const jwtSecret = process.env.SUPABASE_JWT_SECRET
-
-  if (!jwtSecret) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Missing SUPABASE_JWT_SECRET',
-    })
-  }
-
-  try {
-    const payload = jwt.verify(token, jwtSecret, {
-      algorithms: ['HS256'],
-      audience: 'authenticated',
-    }) as SupabaseJwtPayload
-
-    return payload.sub ?? null
-  } catch {
-    return null
-  }
+type DbTask = {
+  id: string
+  title: string
+  description: string | null
+  status: TaskStatus
+  due_date_time: string | null
+  created_at: string
+  updated_at: string
 }
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{
-    title?: string
-    description?: string
-    dueDateTime?: string
-    status?: TaskStatus
-  }>(event)
+  const body = await readBody<CreateTaskBody>(event)
 
   const title = body.title?.trim()
 
@@ -70,35 +38,37 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (!body.dueDateTime || Number.isNaN(Date.parse(body.dueDateTime))) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'dueDateTime must be a valid ISO date string',
-    })
-  }
+  const description = body.description?.trim() ?? ''
+  const rawStatus = body.status ?? 'todo'
 
-  const status = body.status ?? 'todo'
-
-  if (!allowedStatuses.includes(status)) {
+  if (!allowedStatuses.includes(rawStatus as TaskStatus)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'status must be todo, in_progress, or done',
     })
   }
 
-  const userId = await getOptionalUserId(event)
+  const status = rawStatus as TaskStatus
+
+  const dueDateTime = body.dueDateTime?.trim() || null
+
+  if (dueDateTime && Number.isNaN(Date.parse(dueDateTime))) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'dueDateTime must be a valid date string',
+    })
+  }
 
   try {
-    const result = await db.query(
+    const result = await db.query<DbTask>(
       `
         insert into tasks (
           title,
           description,
           status,
-          due_date_time,
-          user_id
+          due_date_time
         )
-        values ($1, $2, $3, $4, $5)
+        values ($1, $2, $3, $4)
         returning
           id,
           title,
@@ -110,24 +80,23 @@ export default defineEventHandler(async (event) => {
       `,
       [
         title,
-        body.description?.trim() ?? '',
+        description,
         status,
-        body.dueDateTime,
-        userId,
+        dueDateTime,
       ],
     )
 
-    const data = result.rows[0]
+    const task = result.rows[0]
 
     return {
       task: {
-        id: data.id,
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        dueDateTime: data.due_date_time,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: task.id,
+        title: task.title,
+        description: task.description ?? '',
+        status: task.status,
+        dueDateTime: task.due_date_time ?? '',
+        createdAt: task.created_at,
+        updatedAt: task.updated_at,
       },
     }
   } catch (error) {
