@@ -1,15 +1,18 @@
 <script setup lang="ts">
 interface Task {
-  id: number
+  id: string
   title: string
   description: string
   status: 'todo' | 'in_progress' | 'done'
   dueDateTime: string
 }
 
+const token = ref('')
 const tasks = ref<Task[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
+
+const authHeaders = computed(() => ({ Authorization: `Bearer ${token.value}` }))
 
 const newTask = ref({
   title: '',
@@ -18,11 +21,19 @@ const newTask = ref({
   status: 'todo' as Task['status'],
 })
 
+onMounted(() => {
+  token.value = localStorage.getItem('sb_access_token') ?? ''
+})
+
+const saveToken = () => {
+  localStorage.setItem('sb_access_token', token.value)
+}
+
 const loadTasks = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await $fetch<{ tasks: Task[] }>('/api/tasks')
+    const response = await $fetch<{ tasks: Task[] }>('/api/tasks', { headers: authHeaders.value })
     tasks.value = response.tasks
   }
   catch (error: any) {
@@ -36,7 +47,7 @@ const loadTasks = async () => {
 const createTask = async () => {
   errorMessage.value = ''
   try {
-    await $fetch('/api/tasks', { method: 'POST', body: newTask.value })
+    await $fetch('/api/tasks', { method: 'POST', headers: authHeaders.value, body: newTask.value })
     newTask.value = { title: '', description: '', dueDateTime: '', status: 'todo' }
     await loadTasks()
   }
@@ -48,7 +59,7 @@ const createTask = async () => {
 const updateStatus = async (task: Task, status: Task['status']) => {
   errorMessage.value = ''
   try {
-    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', body: { status } })
+    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', headers: authHeaders.value, body: { status } })
     task.status = status
   }
   catch (error: any) {
@@ -56,18 +67,16 @@ const updateStatus = async (task: Task, status: Task['status']) => {
   }
 }
 
-const deleteTask = async (id: number) => {
+const deleteTask = async (id: string) => {
   errorMessage.value = ''
   try {
-    await $fetch(`/api/tasks/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/tasks/${id}`, { method: 'DELETE', headers: authHeaders.value })
     tasks.value = tasks.value.filter(task => task.id !== id)
   }
   catch (error: any) {
     errorMessage.value = error?.data?.statusMessage ?? 'Failed to delete task'
   }
 }
-
-onMounted(loadTasks)
 </script>
 
 <template>
@@ -76,6 +85,15 @@ onMounted(loadTasks)
       <h1 class="text-3xl font-bold">Caseworker Tasks</h1>
       <p class="text-gray-600">Create, track, and complete casework tasks.</p>
     </header>
+
+    <section class="rounded-lg border p-4 space-y-3">
+      <label class="mb-2 block text-sm font-medium">Access token (Bearer)</label>
+      <textarea v-model="token" rows="3" class="w-full rounded border px-3 py-2" />
+      <div class="mt-2 flex gap-2">
+        <button class="rounded bg-black px-4 py-2 text-white" @click="loadTasks">Load tasks</button>
+        <button class="rounded bg-gray-500 px-4 py-2 text-white" @click="saveToken">Save token</button>
+      </div>
+    </section>
 
     <section class="rounded-lg border p-4 space-y-3">
       <h2 class="text-xl font-semibold">Create task</h2>

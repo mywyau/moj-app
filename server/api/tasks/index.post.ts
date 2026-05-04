@@ -1,9 +1,12 @@
-import { getNextTaskId, getTasks, type Task, type TaskStatus } from './_mock-store'
+import { getServerSupabase } from '~/server/utils/supabase'
+import { requireUser } from '~/server/utils/auth'
 
-const allowedStatuses: TaskStatus[] = ['todo', 'in_progress', 'done']
+const allowedStatuses = ['todo', 'in_progress', 'done'] as const
+type TaskStatus = typeof allowedStatuses[number]
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<Partial<Task>>(event)
+  const user = await requireUser(event)
+  const body = await readBody<{ title?: string; description?: string; dueDateTime?: string; status?: TaskStatus }>(event)
 
   const title = body.title?.trim()
   if (!title) {
@@ -19,17 +22,32 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'status must be todo, in_progress, or done' })
   }
 
-  const now = new Date().toISOString()
-  const task: Task = {
-    id: getNextTaskId(),
-    title,
-    description: body.description?.trim() ?? '',
-    status,
-    dueDateTime: body.dueDateTime,
-    createdAt: now,
-    updatedAt: now,
+  const supabase = getServerSupabase()
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert({
+      user_id: user.id,
+      title,
+      description: body.description?.trim() ?? '',
+      status,
+      due_date_time: body.dueDateTime,
+    })
+    .select('id, title, description, status, due_date_time, created_at, updated_at')
+    .single()
+
+  if (error) {
+    throw createError({ statusCode: 500, statusMessage: error.message })
   }
 
-  getTasks().unshift(task)
-  return { task }
+  return {
+    task: {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      status: data.status,
+      dueDateTime: data.due_date_time,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    },
+  }
 })
