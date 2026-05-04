@@ -1,57 +1,53 @@
-import {
-  createError,
-  defineEventHandler,
-  readBody,
-} from 'h3'
-import { db } from '~/server/db/db'
-import { getSupabaseAdmin } from '~/server/utils/supabase-admin'
+import { createError, defineEventHandler, readBody } from "h3";
+import { db } from "~/server/db/db";
+import { getSupabaseAdmin } from "~/server/utils/supabase-admin";
 
 type SignupBody = {
-  email?: string
-  password?: string
-  full_name?: string | null
-  avatar_url?: string | null
-}
+  email?: string;
+  password?: string;
+  full_name?: string | null;
+  avatar_url?: string | null;
+};
 
 type ProfileRow = {
-  id: string
-  email: string | null
-  full_name: string | null
-  avatar_url: string | null
-  created_at: string
-  updated_at: string
-}
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<SignupBody>(event)
+  const body = await readBody<SignupBody>(event);
 
-  const email = body.email?.trim().toLowerCase()
-  const password = body.password
-  const fullName = body.full_name?.trim() || null
-  const avatarUrl = body.avatar_url?.trim() || null
+  const email = body.email?.trim().toLowerCase();
+  const password = body.password;
+  const fullName = body.full_name?.trim() || null;
+  const avatarUrl = body.avatar_url?.trim() || null;
 
   if (!email) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'email is required',
-    })
+      statusMessage: "email is required",
+    });
   }
 
   if (!password || password.length < 8) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'password must be at least 8 characters',
-    })
+      statusMessage: "password must be at least 8 characters",
+    });
   }
 
   if (fullName && fullName.length > 200) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'full_name must be <= 200 chars',
-    })
+      statusMessage: "full_name must be <= 200 chars",
+    });
   }
 
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = getSupabaseAdmin();
 
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email,
@@ -61,13 +57,13 @@ export default defineEventHandler(async (event) => {
       full_name: fullName,
       avatar_url: avatarUrl,
     },
-  })
+  });
 
   if (error || !data.user) {
     throw createError({
       statusCode: 400,
-      statusMessage: error?.message ?? 'Failed to create user',
-    })
+      statusMessage: error?.message ?? "Failed to create user",
+    });
   }
 
   try {
@@ -96,13 +92,8 @@ export default defineEventHandler(async (event) => {
           created_at,
           updated_at
       `,
-      [
-        data.user.id,
-        data.user.email ?? email,
-        fullName,
-        avatarUrl,
-      ],
-    )
+      [data.user.id, data.user.email ?? email, fullName, avatarUrl],
+    );
 
     return {
       user: {
@@ -110,13 +101,20 @@ export default defineEventHandler(async (event) => {
         email: data.user.email,
       },
       profile: result.rows[0],
-    }
-  } catch (error) {
-    console.error('User created but profile insert failed', error)
+    };
+  } catch (error: any) {
+    console.error("User created but profile insert failed:", {
+      message: error?.message,
+      code: error?.code,
+      detail: error?.detail,
+      constraint: error?.constraint,
+      table: error?.table,
+    });
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'User created but failed to create profile',
-    })
+      statusMessage:
+        error?.message ?? "User created but failed to create profile",
+    });
   }
-})
+});

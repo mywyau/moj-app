@@ -5,6 +5,6 @@ export default defineEventHandler(async () => {
     ok: true,
     timestamp: new Date().toISOString(),
     redisConfigured: Boolean(config.upstashRedisRestUrl && config.upstashRedisRestToken),
-    supabaseConfigured: Boolean(config.public.supabaseUrl && config.public.supabaseAnonKey)
+    supabaseConfigured: Boolean(config.public.supabaseUrl && config.public.supabaseKey)
   }
 })

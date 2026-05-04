@@ -1,21 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 
 export const getSupabaseAdmin = () => {
-
   const config = useRuntimeConfig()
 
   const supabaseUrl = config.public.supabaseUrl
-  const supabaseKey = config.public.supabaseKey
+  const serviceRoleKey = config.supabaseServiceRoleKey
 
   if (!supabaseUrl) {
     throw new Error('Missing runtimeConfig.public.supabaseUrl')
   }
 
-  if (!supabaseKey) {
-    throw new Error('Missing runtimeConfig.supabaseKey')
+  if (!serviceRoleKey) {
+    throw new Error('Missing runtimeConfig.supabaseServiceRoleKey')
   }
 
-  return createClient(supabaseUrl, supabaseKey, {
+  return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
