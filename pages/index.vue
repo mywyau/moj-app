@@ -3,7 +3,7 @@ useSeoMeta({
   title: 'Ministry of Justice Digital Services',
   description: 'Access Ministry of Justice information and digital services for citizens, legal professionals, and partner organisations.',
   ogTitle: 'Ministry of Justice Digital Services',
-  ogDescription: 'Official Ministry of Justice portal for services, guidance, and updates.',
+  ogDescription: 'Official Ministry of Justice platform for services, guidance, and updates.',
 })
 
 const serviceHighlights = [

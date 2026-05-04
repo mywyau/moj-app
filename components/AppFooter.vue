@@ -9,7 +9,7 @@
         </NuxtLink>
 
         <p class="mt-2 text-gray-800 text-sm sm:max-w-sm">
-          Official digital services portal for Ministry of Justice information and access.
+          Official digital services internal platform for Ministry of Justice information and access.
         </p>
       </div>
 
