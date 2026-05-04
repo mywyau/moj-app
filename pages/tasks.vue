@@ -216,11 +216,11 @@ const getStatusClass = (status: Task['status']) => {
 
       <label class="block min-w-0 space-y-1">
         <span class="block text-sm font-medium text-gray-700">
-          Description
+          Description (optional)
         </span>
 
         <textarea v-model="newTask.description" rows="3" class="w-full min-w-0 rounded border px-3 py-2"
-          placeholder="Description optional" />
+          placeholder="Write your task description here" />
       </label>
 
       <div class="flex flex-col gap-2 sm:flex-row">
