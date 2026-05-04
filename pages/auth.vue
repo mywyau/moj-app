@@ -18,14 +18,18 @@ onMounted(async () => {
   await saveSession()
 })
 
-const upsertProfile = async (accessToken: string) => {
-  if (!accessToken) return
+const upsertProfile = async (userId: string, userEmail: string | null | undefined) => {
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({
+      id: userId,
+      email: userEmail ?? null,
+      full_name: fullName.value || null
+    })
 
-  await $fetch('/api/profile', {
-    method: 'PUT',
-    headers: { Authorization: `Bearer ${accessToken}` },
-    body: { full_name: fullName.value || null }
-  })
+  if (error) {
+    throw error
+  }
 }
 
 const signUp = async () => {
@@ -36,13 +40,15 @@ const signUp = async () => {
     return
   }
 
-  const accessToken = data.session?.access_token
-
-  if (accessToken) {
-    await upsertProfile(accessToken)
-    message.value = 'Signed up successfully and profile created.'
-  } else {
-    message.value = 'Sign up request sent. Check your inbox if email confirmation is enabled.'
+  try {
+    if (data.user && data.session) {
+      await upsertProfile(data.user.id, data.user.email)
+      message.value = 'Signed up successfully and profile created.'
+    } else {
+      message.value = 'Sign up request sent. Check your inbox if email confirmation is enabled.'
+    }
+  } catch (profileError: any) {
+    message.value = `Signed up, but profile creation failed: ${profileError.message ?? 'Unknown error'}`
   }
 
   await saveSession()
