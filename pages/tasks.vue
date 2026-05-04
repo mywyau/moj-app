@@ -7,12 +7,11 @@ interface Task {
   dueDateTime: string
 }
 
+const supabase = useSupabaseClient()
 const token = ref('')
 const tasks = ref<Task[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
-
-const authHeaders = computed(() => ({ Authorization: `Bearer ${token.value}` }))
 
 const newTask = ref({
   title: '',
@@ -21,23 +20,50 @@ const newTask = ref({
   status: 'todo' as Task['status'],
 })
 
-onMounted(() => {
-  token.value = localStorage.getItem('sb_access_token') ?? ''
-})
-
 const saveToken = () => {
   localStorage.setItem('sb_access_token', token.value)
 }
+
+const refreshTokenFromSession = async () => {
+  const { data } = await supabase.auth.getSession()
+  const sessionToken = data.session?.access_token ?? ''
+
+  if (sessionToken) {
+    token.value = sessionToken
+    saveToken()
+  }
+}
+
+const getAuthHeaders = async () => {
+  if (!token.value) {
+    token.value = localStorage.getItem('sb_access_token') ?? ''
+  }
+
+  await refreshTokenFromSession()
+
+  if (!token.value) {
+    throw createError({ statusCode: 401, statusMessage: 'Please sign in on /auth before managing tasks.' })
+  }
+
+  return { Authorization: `Bearer ${token.value}` }
+}
+
+onMounted(async () => {
+  token.value = localStorage.getItem('sb_access_token') ?? ''
+  await refreshTokenFromSession()
+  await loadTasks()
+})
 
 const loadTasks = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await $fetch<{ tasks: Task[] }>('/api/tasks', { headers: authHeaders.value })
+    const headers = await getAuthHeaders()
+    const response = await $fetch<{ tasks: Task[] }>('/api/tasks', { headers })
     tasks.value = response.tasks
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to load tasks'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to load tasks'
   }
   finally {
     loading.value = false
@@ -47,34 +73,37 @@ const loadTasks = async () => {
 const createTask = async () => {
   errorMessage.value = ''
   try {
-    await $fetch('/api/tasks', { method: 'POST', headers: authHeaders.value, body: newTask.value })
+    const headers = await getAuthHeaders()
+    await $fetch('/api/tasks', { method: 'POST', headers, body: newTask.value })
     newTask.value = { title: '', description: '', dueDateTime: '', status: 'todo' }
     await loadTasks()
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to create task'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to create task'
   }
 }
 
 const updateStatus = async (task: Task, status: Task['status']) => {
   errorMessage.value = ''
   try {
-    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', headers: authHeaders.value, body: { status } })
+    const headers = await getAuthHeaders()
+    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', headers, body: { status } })
     task.status = status
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to update task status'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to update task status'
   }
 }
 
 const deleteTask = async (id: string) => {
   errorMessage.value = ''
   try {
-    await $fetch(`/api/tasks/${id}`, { method: 'DELETE', headers: authHeaders.value })
+    const headers = await getAuthHeaders()
+    await $fetch(`/api/tasks/${id}`, { method: 'DELETE', headers })
     tasks.value = tasks.value.filter(task => task.id !== id)
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to delete task'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to delete task'
   }
 }
 </script>
