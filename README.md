@@ -13,14 +13,11 @@ A Nuxt 3 web app deployed with Nitro on Vercel, backed by Supabase auth/data and
 
 ## Features currently in this repo
 
-- Public site pages (home, contact, legal pages, patch notes).
-- Auth entry flow (`/auth`, `/please-sign-in`).
-- App pages for tasks, notes, and dashboard.
+- Public site pages (home, contact, legal pages, patch notes)
+- App pages for tasks and dashboard.
 - Server API routes for:
   - profile CRUD endpoints
   - task CRUD endpoints
-  - notes CRUD endpoints
-  - signup and health endpoints
 - Shared utilities for Supabase auth/admin access and DB access.
 
 ## Project structure
