@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-  <main class="max-w-xl mx-auto px-4 py-20 space-y-8 text-center">>
+  <main class="max-w-xl mx-auto px-4 py-20 space-y-8 text-center">
 
     <div class="text-left">
       <BackLink />

@@ -18,7 +18,6 @@ const newTask = ref({
   title: '',
   description: '',
   dueDateTime: '',
-  status: 'todo' as Task['status'],
 })
 
 const editTask = ref({
@@ -65,7 +64,7 @@ const createTask = async () => {
         title: newTask.value.title.trim(),
         description: newTask.value.description.trim(),
         dueDateTime: newTask.value.dueDateTime,
-        status: newTask.value.status,
+        status: 'todo',
       },
     })
 
@@ -73,7 +72,6 @@ const createTask = async () => {
       title: '',
       description: '',
       dueDateTime: '',
-      status: 'todo',
     }
 
     await loadTasks()
@@ -135,22 +133,6 @@ const updateTask = async (taskId: string) => {
   }
 }
 
-const updateStatus = async (task: Task, status: Task['status']) => {
-  errorMessage.value = ''
-
-  try {
-    await $fetch(`/api/tasks/${task.id}`, {
-      method: 'PATCH',
-      body: { status },
-    })
-
-    task.status = status
-  }
-  catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to update task status'
-  }
-}
-
 const deleteTask = async (id: string) => {
   errorMessage.value = ''
 
@@ -171,6 +153,26 @@ const formatDueDate = (dueDateTime: string) => {
 
   return new Date(dueDateTime).toLocaleString()
 }
+
+const formatStatus = (status: Task['status']) => {
+  if (status === 'todo') return 'To do'
+  if (status === 'in_progress') return 'In progress'
+  return 'Done'
+}
+
+const getStatusClass = (status: Task['status']) => {
+  if (status === 'todo') {
+    return 'bg-amber-100 text-amber-800 border-amber-200'
+  }
+
+  if (status === 'in_progress') {
+    return 'bg-blue-100 text-blue-800 border-blue-200'
+  }
+
+  return 'bg-emerald-100 text-emerald-800 border-emerald-200'
+}
+
+
 </script>
 
 <template>
@@ -190,41 +192,29 @@ const formatDueDate = (dueDateTime: string) => {
       </p>
 
       <div class="grid gap-3 sm:grid-cols-2">
-        <input
-          v-model="newTask.title"
-          class="rounded border px-3 py-2"
-          placeholder="Todo title"
-        />
+        <label class="space-y-1">
+          <span class="block text-sm font-medium text-gray-700">
+            Todo title
+          </span>
 
-        <input
-          v-model="newTask.dueDateTime"
-          class="rounded border px-3 py-2"
-          type="datetime-local"
-        />
+          <input v-model="newTask.title" class="w-full rounded border px-3 py-2" placeholder="Todo title" />
+        </label>
+
+        <label class="space-y-1">
+          <span class="block text-sm font-medium text-gray-700">
+            Due date
+          </span>
+
+          <input v-model="newTask.dueDateTime" class="w-full rounded border px-3 py-2" type="datetime-local" />
+        </label>
       </div>
 
-      <textarea
-        v-model="newTask.description"
-        rows="3"
-        class="w-full rounded border px-3 py-2"
-        placeholder="Description optional"
-      />
-
-      <select
-        v-model="newTask.status"
-        class="rounded border px-3 py-2"
-      >
-        <option value="todo">To do</option>
-        <option value="in_progress">In progress</option>
-        <option value="done">Done</option>
-      </select>
+      <textarea v-model="newTask.description" rows="3" class="w-full rounded border px-3 py-2"
+        placeholder="Description optional" />
 
       <div>
-        <button
-          class="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
-          :disabled="saving"
-          @click="createTask"
-        >
+        <button class="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50" :disabled="saving"
+          @click="createTask">
           {{ saving ? 'Creating...' : 'Create todo' }}
         </button>
       </div>
@@ -234,10 +224,7 @@ const formatDueDate = (dueDateTime: string) => {
       <div class="mb-3 flex items-center justify-between">
         <h2 class="text-xl font-semibold">All todos</h2>
 
-        <button
-          class="rounded bg-gray-900 px-3 py-1 text-white"
-          @click="loadTasks"
-        >
+        <button class="rounded bg-gray-900 px-3 py-1 text-white" @click="loadTasks">
           Refresh
         </button>
       </div>
@@ -247,54 +234,42 @@ const formatDueDate = (dueDateTime: string) => {
       </p>
 
       <ul v-else-if="tasks.length" class="space-y-3">
-        <li
-          v-for="task in tasks"
-          :key="task.id"
-          class="rounded border p-3"
-        >
+        <li v-for="task in tasks" :key="task.id" class="rounded border p-3">
           <div v-if="editingTaskId === task.id" class="space-y-3">
-            <div class="grid gap-3 sm:grid-cols-2">
-              <input
-                v-model="editTask.title"
-                class="rounded border px-3 py-2"
-                placeholder="Todo title"
-              />
 
-              <input
-                v-model="editTask.dueDateTime"
-                class="rounded border px-3 py-2"
-                type="datetime-local"
-              />
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="space-y-1">
+                <span class="block text-sm font-medium text-gray-700">
+                  Todo title
+                </span>
+
+                <input v-model="editTask.title" class="w-full rounded border px-3 py-2" placeholder="Todo title" />
+              </label>
+
+              <label class="space-y-1">
+                <span class="block text-sm font-medium text-gray-700">
+                  Due date
+                </span>
+
+                <input v-model="editTask.dueDateTime" class="w-full rounded border px-3 py-2" type="datetime-local" />
+              </label>
             </div>
 
-            <textarea
-              v-model="editTask.description"
-              rows="3"
-              class="w-full rounded border px-3 py-2"
-              placeholder="Description optional"
-            />
+            <textarea v-model="editTask.description" rows="3" class="w-full rounded border px-3 py-2"
+              placeholder="Description optional" />
 
-            <select
-              v-model="editTask.status"
-              class="rounded border px-3 py-2"
-            >
+            <select v-model="editTask.status" class="rounded border px-3 py-2">
               <option value="todo">To do</option>
               <option value="in_progress">In progress</option>
               <option value="done">Done</option>
             </select>
 
             <div class="flex gap-2">
-              <button
-                class="rounded bg-green-600 px-3 py-1 text-white"
-                @click="updateTask(task.id)"
-              >
+              <button class="rounded bg-green-600 px-3 py-1 text-white" @click="updateTask(task.id)">
                 Save
               </button>
 
-              <button
-                class="rounded bg-gray-500 px-3 py-1 text-white"
-                @click="cancelEditing"
-              >
+              <button class="rounded bg-gray-500 px-3 py-1 text-white" @click="cancelEditing">
                 Cancel
               </button>
             </div>
@@ -302,9 +277,15 @@ const formatDueDate = (dueDateTime: string) => {
 
           <div v-else class="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 class="font-semibold">
-                {{ task.title }}
-              </h3>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="font-semibold">
+                  {{ task.title }}
+                </h3>
+
+                <span class="rounded border px-2 py-1 text-xs font-medium" :class="getStatusClass(task.status)">
+                  {{ formatStatus(task.status) }}
+                </span>
+              </div>
 
               <p class="text-sm text-gray-700">
                 {{ task.description || 'No description provided.' }}
@@ -316,27 +297,11 @@ const formatDueDate = (dueDateTime: string) => {
             </div>
 
             <div class="flex items-center gap-2">
-              <select
-                :value="task.status"
-                class="rounded border px-2 py-1"
-                @change="updateStatus(task, ($event.target as HTMLSelectElement).value as Task['status'])"
-              >
-                <option value="todo">To do</option>
-                <option value="in_progress">In progress</option>
-                <option value="done">Done</option>
-              </select>
-
-              <button
-                class="rounded bg-gray-700 px-3 py-1 text-white"
-                @click="startEditing(task)"
-              >
+              <button class="rounded bg-gray-700 px-3 py-1 text-white" @click="startEditing(task)">
                 Edit
               </button>
 
-              <button
-                class="rounded bg-red-600 px-3 py-1 text-white"
-                @click="deleteTask(task.id)"
-              >
+              <button class="rounded bg-red-600 px-3 py-1 text-white" @click="deleteTask(task.id)">
                 Delete
               </button>
             </div>
