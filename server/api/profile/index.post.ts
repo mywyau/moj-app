@@ -3,7 +3,7 @@ import {
   defineEventHandler,
   readBody,
 } from 'h3'
-import { pool } from '~/server/db/db'
+import { db } from '~/server/db/db'
 import { requireUser } from '~/server/utils/auth'
 
 type ProfileRow = {
@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
     avatar_url?: string | null
   }>(event)
 
-  const fullName = body.full_name?.trim() || null
-  const avatarUrl = body.avatar_url?.trim() || null
+  const fullName = body?.full_name?.trim() || null
+  const avatarUrl = body?.avatar_url?.trim() || null
 
   if (fullName && fullName.length > 200) {
     throw createError({
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const result = await pool.query<ProfileRow>(
+    const result = await db.query<ProfileRow>(
       `
         insert into profiles (
           id,
@@ -48,8 +48,8 @@ export default defineEventHandler(async (event) => {
         on conflict (id)
         do update set
           email = excluded.email,
-          full_name = coalesce(excluded.full_name, profiles.full_name),
-          avatar_url = coalesce(excluded.avatar_url, profiles.avatar_url),
+          full_name = excluded.full_name,
+          avatar_url = excluded.avatar_url,
           updated_at = now()
         returning
           id,

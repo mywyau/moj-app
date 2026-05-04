@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     public: {
       appName: "moj-app",
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
-      supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY,
+      // supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY,
+      supabaseKey: process.env.NUXT_PUBLIC_SUPABASE_KEY,
     },
   },
   experimental: {
