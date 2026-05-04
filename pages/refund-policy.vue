@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'Refund Policy · TaroTea'
+  title: 'Refund Policy · Ministry of Justice'
 })
 </script>
 
@@ -22,7 +22,7 @@ definePageMeta({
     <section class="space-y-4 text-gray-700">
       <p>
         This Refund Policy explains how refunds are handled for subscriptions
-        purchased on TaroTea.
+        purchased on Ministry of Justice.
       </p>
     </section>
 
@@ -30,7 +30,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">1. Digital subscriptions</h2>
 
       <p class="text-gray-700">
-        TaroTea provides access to digital learning content through monthly or yearly
+        Ministry of Justice provides access to digital learning content through monthly or yearly
         subscriptions.
       </p>
 
@@ -64,7 +64,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">3. Account deletion</h2>
 
       <p class="text-gray-700">
-        Deleting your account permanently removes your access to TaroTea and any associated data.
+        Deleting your account permanently removes your access to Ministry of Justice and any associated data.
       </p>
 
       <p class="text-gray-700">
@@ -100,8 +100,8 @@ definePageMeta({
       <p class="text-gray-700">
         For billing or refund questions, please contact:
         <br />
-        <a href="mailto:billing@tarotea.co.uk" class="font-medium">
-          billing@tarotea.co.uk
+        <a href="mailto:billing@justice.gov.uk" class="font-medium">
+          billing@justice.gov.uk
         </a>
       </p>
     </section>

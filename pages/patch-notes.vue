@@ -3,7 +3,7 @@ import { patchNotes } from '@/utils/patchNotes'
 import { computed, watchEffect } from 'vue'
 
 definePageMeta({
-  title: 'What’s new · TaroTea'
+  title: 'What’s new · Ministry of Justice'
 })
 
 const route = useRoute()

@@ -16,10 +16,10 @@ const runtimeConfig = useRuntimeConfig()
 
 // useSeoMeta({
 //   ogUrl: `${baseUrl}/`,
-//   ogTitle: 'TaroTea · Learn Cantonese',
-//   ogDescription: 'Learn natural Cantonese with exercises, vocabulary, audio and quizzes.',
-//   twitterTitle: 'TaroTea · Learn Cantonese',
-//   twitterDescription: 'Learn natural Cantonese with exercises, vocabulary, audio and quizzes.',
+//   ogTitle: 'Ministry of Justice · Learn Ministry of Justice',
+//   ogDescription: 'Learn natural Ministry of Justice with exercises, vocabulary, audio and quizzes.',
+//   twitterTitle: 'Ministry of Justice · Learn Ministry of Justice',
+//   twitterDescription: 'Learn natural Ministry of Justice with exercises, vocabulary, audio and quizzes.',
 // })
 
 </script>

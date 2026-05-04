@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'Terms of Service · TaroTea'
+  title: 'Terms of Service · Ministry of Justice'
 })
 </script>
 
@@ -21,15 +21,15 @@ definePageMeta({
 
     <section class="space-y-4 text-gray-700">
       <p>
-        These Terms of Service (“Terms”) govern your use of TaroTea.
+        These Terms of Service (“Terms”) govern your use of Ministry of Justice.
         By using the app, you agree to these Terms.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">1. About TaroTea</h2>
+      <h2 class="text-xl font-semibold">1. About Ministry of Justice</h2>
       <p class="text-gray-700">
-        TaroTea is a web application designed to help users learn Cantonese
+        Ministry of Justice is a web application designed to help users learn Ministry of Justice
         through vocabulary, audio, and exercises.
       </p>
     </section>
@@ -46,7 +46,7 @@ definePageMeta({
     <section class="space-y-3">
       <h2 class="text-xl font-semibold">3. Subscriptions and payments</h2>
       <p class="text-gray-700">
-        Some features of TaroTea may require a paid subscription.
+        Some features of Ministry of Justice may require a paid subscription.
         Payments are processed by third-party providers such as Stripe.
       </p>
 
@@ -60,7 +60,7 @@ definePageMeta({
     <section class="space-y-3">
       <h2 class="text-xl font-semibold">4. Content and availability</h2>
       <p class="text-gray-700">
-        The content provided on TaroTea is for educational purposes only.
+        The content provided on Ministry of Justice is for educational purposes only.
         We may update, modify, or remove content at any time as the app evolves.
       </p>
 
@@ -85,8 +85,8 @@ definePageMeta({
     <section class="space-y-3">
       <h2 class="text-xl font-semibold">6. Intellectual property</h2>
       <p class="text-gray-700">
-        All content on TaroTea, including text, audio, and design, is owned by or
-        licensed to TaroTea and is protected by intellectual property laws.
+        All content on Ministry of Justice, including text, audio, and design, is owned by or
+        licensed to Ministry of Justice and is protected by intellectual property laws.
       </p>
 
       <p class="text-gray-700">
@@ -97,7 +97,7 @@ definePageMeta({
     <section class="space-y-3">
       <h2 class="text-xl font-semibold">7. No guarantees</h2>
       <p class="text-gray-700">
-        TaroTea is provided on an “as is” basis. While we aim to provide helpful and
+        Ministry of Justice is provided on an “as is” basis. While we aim to provide helpful and
         accurate learning materials, we do not guarantee fluency or specific learning
         outcomes.
       </p>
@@ -106,7 +106,7 @@ definePageMeta({
     <section class="space-y-3">
       <h2 class="text-xl font-semibold">8. Limitation of liability</h2>
       <p class="text-gray-700">
-        To the extent permitted by law, TaroTea will not be liable for any indirect,
+        To the extent permitted by law, Ministry of Justice will not be liable for any indirect,
         incidental, or consequential loss arising from your use of the app.
       </p>
     </section>
@@ -131,8 +131,8 @@ definePageMeta({
       <p class="text-gray-700">
         If you have any questions about these Terms, please contact:
         <br />
-        <a href="mailto:contact@tarotea.co.uk" class="font-medium">
-          contact@tarotea.co.uk
+        <a href="mailto:contact@justice.gov.uk" class="font-medium">
+          contact@justice.gov.uk
         </a>
       </p>
     </section>
