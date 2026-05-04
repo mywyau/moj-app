@@ -84,3 +84,12 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## 9) Database schema (saved)
+
+The initial Supabase schema is saved at:
+
+- `supabase/initial_schema.sql`
+
+You can run it in the Supabase SQL Editor to recreate tables/policies consistently.
+
