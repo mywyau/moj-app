@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss", "@nuxtjs/supabase"],
   supabase: {
     types: false,
+    redirect: false,
   },
   devtools: { enabled: true },
   runtimeConfig: {
