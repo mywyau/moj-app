@@ -1,6 +1,8 @@
 <script setup lang="ts">
+const supabase = useSupabaseClient()
+
 interface Task {
-  id: number
+  id: string
   status: 'todo' | 'in_progress' | 'done'
   dueDateTime: string
 }
@@ -8,14 +10,32 @@ interface Task {
 const tasks = ref<Task[]>([])
 const errorMessage = ref('')
 
+const getAuthHeaders = async () => {
+  const storedToken = localStorage.getItem('sb_access_token') ?? ''
+  const { data } = await supabase.auth.getSession()
+  const sessionToken = data.session?.access_token ?? ''
+  const token = sessionToken || storedToken
+
+  if (!token) {
+    throw createError({ statusCode: 401, statusMessage: 'Please sign in on /auth to view dashboard data.' })
+  }
+
+  if (sessionToken) {
+    localStorage.setItem('sb_access_token', sessionToken)
+  }
+
+  return { Authorization: `Bearer ${token}` }
+}
+
 const loadTasks = async () => {
   errorMessage.value = ''
   try {
-    const response = await $fetch<{ tasks: Task[] }>('/api/tasks')
+    const headers = await getAuthHeaders()
+    const response = await $fetch<{ tasks: Task[] }>('/api/tasks', { headers })
     tasks.value = response.tasks
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Could not load dashboard data'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Could not load dashboard data'
   }
 }
 

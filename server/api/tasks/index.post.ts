@@ -1,9 +1,31 @@
-import { getNextTaskId, getTasks, type Task, type TaskStatus } from './_mock-store'
+import type { H3Event } from 'h3'
+import { getServerSupabase } from '~/server/utils/supabase'
 
-const allowedStatuses: TaskStatus[] = ['todo', 'in_progress', 'done']
+const allowedStatuses = ['todo', 'in_progress', 'done'] as const
+type TaskStatus = typeof allowedStatuses[number]
+
+const getOptionalUserId = async (event: H3Event) => {
+  const authorization = getHeader(event, 'authorization')
+  if (!authorization?.startsWith('Bearer ')) {
+    return null
+  }
+
+  const token = authorization.slice('Bearer '.length).trim()
+  if (!token) {
+    return null
+  }
+
+  const supabase = getServerSupabase()
+  const { data, error } = await supabase.auth.getUser(token)
+  if (error || !data.user) {
+    return null
+  }
+
+  return data.user.id
+}
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<Partial<Task>>(event)
+  const body = await readBody<{ title?: string; description?: string; dueDateTime?: string; status?: TaskStatus }>(event)
 
   const title = body.title?.trim()
   if (!title) {
@@ -19,17 +41,39 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'status must be todo, in_progress, or done' })
   }
 
-  const now = new Date().toISOString()
-  const task: Task = {
-    id: getNextTaskId(),
+  const userId = await getOptionalUserId(event)
+
+  const supabase = getServerSupabase()
+  const insertPayload: Record<string, unknown> = {
     title,
     description: body.description?.trim() ?? '',
     status,
-    dueDateTime: body.dueDateTime,
-    createdAt: now,
-    updatedAt: now,
+    due_date_time: body.dueDateTime,
   }
 
-  getTasks().unshift(task)
-  return { task }
+  if (userId) {
+    insertPayload.user_id = userId
+  }
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert(insertPayload)
+    .select('id, title, description, status, due_date_time, created_at, updated_at')
+    .single()
+
+  if (error) {
+    throw createError({ statusCode: 500, statusMessage: error.message })
+  }
+
+  return {
+    task: {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      status: data.status,
+      dueDateTime: data.due_date_time,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    },
+  }
 })

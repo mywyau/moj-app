@@ -21,7 +21,6 @@ Open `http://localhost:3000`.
 ```txt
 .
 ├── app/app.vue                     # landing page + health check
-├── composables/useSupabaseClient.ts
 ├── lib/redis.ts
 ├── server/api/health.get.ts        # starter serverless endpoint
 ├── nuxt.config.ts                  # runtime config + vercel nitro preset

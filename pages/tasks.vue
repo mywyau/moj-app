@@ -1,12 +1,14 @@
 <script setup lang="ts">
 interface Task {
-  id: number
+  id: string
   title: string
   description: string
   status: 'todo' | 'in_progress' | 'done'
   dueDateTime: string
 }
 
+const supabase = useSupabaseClient()
+const token = ref('')
 const tasks = ref<Task[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
@@ -18,15 +20,50 @@ const newTask = ref({
   status: 'todo' as Task['status'],
 })
 
+const saveToken = () => {
+  localStorage.setItem('sb_access_token', token.value)
+}
+
+const refreshTokenFromSession = async () => {
+  const { data } = await supabase.auth.getSession()
+  const sessionToken = data.session?.access_token ?? ''
+
+  if (sessionToken) {
+    token.value = sessionToken
+    saveToken()
+  }
+}
+
+const getAuthHeaders = async () => {
+  if (!token.value) {
+    token.value = localStorage.getItem('sb_access_token') ?? ''
+  }
+
+  await refreshTokenFromSession()
+
+  if (!token.value) {
+    throw createError({ statusCode: 401, statusMessage: 'Please sign in on /auth before managing tasks.' })
+  }
+
+  return { Authorization: `Bearer ${token.value}` }
+}
+
+onMounted(async () => {
+  token.value = localStorage.getItem('sb_access_token') ?? ''
+  await refreshTokenFromSession()
+  await loadTasks()
+})
+
 const loadTasks = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await $fetch<{ tasks: Task[] }>('/api/tasks')
+    const headers = await getAuthHeaders()
+    const response = await $fetch<{ tasks: Task[] }>('/api/tasks', { headers })
     tasks.value = response.tasks
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to load tasks'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to load tasks'
   }
   finally {
     loading.value = false
@@ -36,38 +73,42 @@ const loadTasks = async () => {
 const createTask = async () => {
   errorMessage.value = ''
   try {
-    await $fetch('/api/tasks', { method: 'POST', body: newTask.value })
+    const headers = token.value ? { Authorization: `Bearer ${token.value}` } : undefined
+    await $fetch('/api/tasks', { method: 'POST', headers, body: newTask.value })
     newTask.value = { title: '', description: '', dueDateTime: '', status: 'todo' }
-    await loadTasks()
+
+    if (token.value) {
+      await loadTasks()
+    }
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to create task'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to create task'
   }
 }
 
 const updateStatus = async (task: Task, status: Task['status']) => {
   errorMessage.value = ''
   try {
-    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', body: { status } })
+    const headers = await getAuthHeaders()
+    await $fetch(`/api/tasks/${task.id}`, { method: 'PATCH', headers, body: { status } })
     task.status = status
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to update task status'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to update task status'
   }
 }
 
-const deleteTask = async (id: number) => {
+const deleteTask = async (id: string) => {
   errorMessage.value = ''
   try {
-    await $fetch(`/api/tasks/${id}`, { method: 'DELETE' })
+    const headers = await getAuthHeaders()
+    await $fetch(`/api/tasks/${id}`, { method: 'DELETE', headers })
     tasks.value = tasks.value.filter(task => task.id !== id)
   }
   catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage ?? 'Failed to delete task'
+    errorMessage.value = error?.data?.statusMessage ?? error?.statusMessage ?? 'Failed to delete task'
   }
 }
-
-onMounted(loadTasks)
 </script>
 
 <template>
@@ -76,6 +117,15 @@ onMounted(loadTasks)
       <h1 class="text-3xl font-bold">Caseworker Tasks</h1>
       <p class="text-gray-600">Create, track, and complete casework tasks.</p>
     </header>
+
+    <section class="rounded-lg border p-4 space-y-3">
+      <label class="mb-2 block text-sm font-medium">Access token (Bearer)</label>
+      <textarea v-model="token" rows="3" class="w-full rounded border px-3 py-2" />
+      <div class="mt-2 flex gap-2">
+        <button class="rounded bg-black px-4 py-2 text-white" @click="loadTasks">Load tasks</button>
+        <button class="rounded bg-gray-500 px-4 py-2 text-white" @click="saveToken">Save token</button>
+      </div>
+    </section>
 
     <section class="rounded-lg border p-4 space-y-3">
       <h2 class="text-xl font-semibold">Create task</h2>
