@@ -3,6 +3,7 @@ const supabase = useSupabaseClient()
 
 const email = ref('')
 const password = ref('')
+const fullName = ref('')
 const message = ref('')
 const token = ref('')
 
@@ -17,9 +18,33 @@ onMounted(async () => {
   await saveSession()
 })
 
+const upsertProfile = async (accessToken: string) => {
+  if (!accessToken) return
+
+  await $fetch('/api/profile', {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: { full_name: fullName.value || null }
+  })
+}
+
 const signUp = async () => {
-  const { error } = await supabase.auth.signUp({ email: email.value, password: password.value })
-  message.value = error ? error.message : 'Sign up request sent. Check your inbox if email confirmation is enabled.'
+  const { data, error } = await supabase.auth.signUp({ email: email.value, password: password.value })
+
+  if (error) {
+    message.value = error.message
+    return
+  }
+
+  const accessToken = data.session?.access_token
+
+  if (accessToken) {
+    await upsertProfile(accessToken)
+    message.value = 'Signed up successfully and profile created.'
+  } else {
+    message.value = 'Sign up request sent. Check your inbox if email confirmation is enabled.'
+  }
+
   await saveSession()
 }
 
@@ -45,6 +70,7 @@ const signOut = async () => {
     <div class="grid gap-3 rounded-lg border p-4">
       <input v-model="email" type="email" placeholder="Email" class="rounded border px-3 py-2" />
       <input v-model="password" type="password" placeholder="Password" class="rounded border px-3 py-2" />
+      <input v-model="fullName" type="text" placeholder="Full name (optional)" class="rounded border px-3 py-2" />
       <div class="flex gap-2">
         <button class="rounded bg-black px-4 py-2 text-white" @click="signUp">Sign up</button>
         <button class="rounded bg-blue-600 px-4 py-2 text-white" @click="signIn">Sign in</button>
