@@ -176,55 +176,68 @@ const getStatusClass = (status: Task['status']) => {
 </script>
 
 <template>
-  <main class="mx-auto max-w-5xl min-h-screen p-8 space-y-8">
-    <header>
-      <h1 class="text-3xl font-bold">Todo List</h1>
-      <p class="text-gray-600">
+  <main class="mx-auto min-h-screen max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+    <header class="space-y-1">
+      <h1 class="text-2xl font-bold sm:text-3xl">
+        Todo List
+      </h1>
+
+      <p class="text-sm text-gray-600 sm:text-base">
         Create, edit, complete, and delete todos.
       </p>
     </header>
 
-    <section class="rounded-lg border p-4 space-y-3">
-      <h2 class="text-xl font-semibold">Create todo</h2>
+    <section class="space-y-4 rounded-lg border p-4 sm:p-6">
+      <h2 class="text-lg font-semibold sm:text-xl">
+        Create todo
+      </h2>
 
       <p v-if="errorMessage" class="text-sm text-red-600">
         {{ errorMessage }}
       </p>
 
-      <div class="grid gap-3 sm:grid-cols-2">
-        <label class="space-y-1">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="min-w-0 space-y-1">
           <span class="block text-sm font-medium text-gray-700">
             Todo title
           </span>
 
-          <input v-model="newTask.title" class="w-full rounded border px-3 py-2" placeholder="Todo title" />
+          <input v-model="newTask.title" class="w-full min-w-0 rounded border px-3 py-2" placeholder="Todo title" />
         </label>
 
-        <label class="space-y-1">
+        <label class="min-w-0 space-y-1">
           <span class="block text-sm font-medium text-gray-700">
             Due date
           </span>
 
-          <input v-model="newTask.dueDateTime" class="w-full rounded border px-3 py-2" type="datetime-local" />
+          <input v-model="newTask.dueDateTime" class="w-full min-w-0 rounded border px-3 py-2" type="datetime-local" />
         </label>
       </div>
 
-      <textarea v-model="newTask.description" rows="3" class="w-full rounded border px-3 py-2"
-        placeholder="Description optional" />
+      <label class="block min-w-0 space-y-1">
+        <span class="block text-sm font-medium text-gray-700">
+          Description
+        </span>
 
-      <div>
-        <button class="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50" :disabled="saving"
+        <textarea v-model="newTask.description" rows="3" class="w-full min-w-0 rounded border px-3 py-2"
+          placeholder="Description optional" />
+      </label>
+
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <button class="w-full rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50 sm:w-auto" :disabled="saving"
           @click="createTask">
           {{ saving ? 'Creating...' : 'Create todo' }}
         </button>
       </div>
     </section>
 
-    <section class="rounded-lg border p-4">
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-xl font-semibold">All todos</h2>
+    <section class="rounded-lg border p-4 sm:p-6">
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-lg font-semibold sm:text-xl">
+          All todos
+        </h2>
 
-        <button class="rounded bg-gray-900 px-3 py-1 text-white" @click="loadTasks">
+        <button class="w-full rounded bg-gray-900 px-3 py-2 text-white sm:w-auto sm:py-1" @click="loadTasks">
           Refresh
         </button>
       </div>
@@ -234,51 +247,65 @@ const getStatusClass = (status: Task['status']) => {
       </p>
 
       <ul v-else-if="tasks.length" class="space-y-3">
-        <li v-for="task in tasks" :key="task.id" class="rounded border p-3">
-          <div v-if="editingTaskId === task.id" class="space-y-3">
-
-            <div class="grid gap-3 sm:grid-cols-2">
-              <label class="space-y-1">
+        <li v-for="task in tasks" :key="task.id" class="rounded border p-4">
+          <div v-if="editingTaskId === task.id" class="space-y-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <label class="min-w-0 space-y-1">
                 <span class="block text-sm font-medium text-gray-700">
                   Todo title
                 </span>
 
-                <input v-model="editTask.title" class="w-full rounded border px-3 py-2" placeholder="Todo title" />
+                <input v-model="editTask.title" class="w-full min-w-0 rounded border px-3 py-2"
+                  placeholder="Todo title" />
               </label>
 
-              <label class="space-y-1">
+              <label class="min-w-0 space-y-1">
                 <span class="block text-sm font-medium text-gray-700">
                   Due date
                 </span>
 
-                <input v-model="editTask.dueDateTime" class="w-full rounded border px-3 py-2" type="datetime-local" />
+                <input v-model="editTask.dueDateTime" class="w-full min-w-0 rounded border px-3 py-2"
+                  type="datetime-local" />
               </label>
             </div>
 
-            <textarea v-model="editTask.description" rows="3" class="w-full rounded border px-3 py-2"
-              placeholder="Description optional" />
+            <label class="block min-w-0 space-y-1">
+              <span class="block text-sm font-medium text-gray-700">
+                Description
+              </span>
 
-            <select v-model="editTask.status" class="rounded border px-3 py-2">
-              <option value="todo">To do</option>
-              <option value="in_progress">In progress</option>
-              <option value="done">Done</option>
-            </select>
+              <textarea v-model="editTask.description" rows="3" class="w-full min-w-0 rounded border px-3 py-2"
+                placeholder="Description optional" />
+            </label>
 
-            <div class="flex gap-2">
-              <button class="rounded bg-green-600 px-3 py-1 text-white" @click="updateTask(task.id)">
+            <label class="block min-w-0 space-y-1 sm:max-w-xs">
+              <span class="block text-sm font-medium text-gray-700">
+                Status
+              </span>
+
+              <select v-model="editTask.status" class="w-full rounded border px-3 py-2">
+                <option value="todo">To do</option>
+                <option value="in_progress">In progress</option>
+                <option value="done">Done</option>
+              </select>
+            </label>
+
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <button class="w-full rounded bg-green-600 px-3 py-2 text-white sm:w-auto sm:py-1"
+                @click="updateTask(task.id)">
                 Save
               </button>
 
-              <button class="rounded bg-gray-500 px-3 py-1 text-white" @click="cancelEditing">
+              <button class="w-full rounded bg-gray-500 px-3 py-2 text-white sm:w-auto sm:py-1" @click="cancelEditing">
                 Cancel
               </button>
             </div>
           </div>
 
-          <div v-else class="flex flex-wrap items-start justify-between gap-3">
-            <div>
+          <div v-else class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="min-w-0 space-y-1">
               <div class="flex flex-wrap items-center gap-2">
-                <h3 class="font-semibold">
+                <h3 class="break-words font-semibold">
                   {{ task.title }}
                 </h3>
 
@@ -287,21 +314,23 @@ const getStatusClass = (status: Task['status']) => {
                 </span>
               </div>
 
-              <p class="text-sm text-gray-700">
+              <p class="break-words text-sm text-gray-700">
                 {{ task.description || 'No description provided.' }}
               </p>
 
-              <p class="mt-1 text-xs text-gray-500">
+              <p class="text-xs text-gray-500">
                 Due: {{ formatDueDate(task.dueDateTime) }}
               </p>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button class="rounded bg-gray-700 px-3 py-1 text-white" @click="startEditing(task)">
+            <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <button class="w-full rounded bg-gray-700 px-3 py-2 text-white sm:w-auto sm:py-1"
+                @click="startEditing(task)">
                 Edit
               </button>
 
-              <button class="rounded bg-red-600 px-3 py-1 text-white" @click="deleteTask(task.id)">
+              <button class="w-full rounded bg-red-600 px-3 py-2 text-white sm:w-auto sm:py-1"
+                @click="deleteTask(task.id)">
                 Delete
               </button>
             </div>
