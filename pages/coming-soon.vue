@@ -19,5 +19,9 @@ definePageMeta({
     <p class="text-gray-800">
       Sit tight, we're still working hard at the MOJ building out this service
     </p>
+
+    <p class="text-gray-800 text-lg">
+      Please use the navigation swirl in the <span class="text-red-500 font-medium">bottom left hand corner :)</span>
+    </p>
   </main>
 </template>
