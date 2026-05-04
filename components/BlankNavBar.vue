@@ -12,15 +12,7 @@ const menuRoot = ref<HTMLElement | null>(null)
 
 const navLinks = computed(() => {
   const links = [
-    { to: '/', label: 'Home', requiresAuth: false },
-    { to: '/daily/vocab/v2/start-quiz', label: 'Daily Quiz', requiresAuth: true },
-    { to: '/daily/jyutping/v2', label: 'Daily Jyutping Quiz', requiresAuth: true },
-    { to: '/levels', label: 'Levels', requiresAuth: false },
-    { to: '/quiz', label: 'Level Quiz', requiresAuth: false },
-    { to: '/dojo/level', label: 'Level Dojo', requiresAuth: false },
-    { to: '/topics', label: 'Topics', requiresAuth: false },
-    { to: '/topics/quiz', label: 'Topic Quiz', requiresAuth: false },
-    { to: '/dojo/topic', label: 'Topic Dojo', requiresAuth: false },
+    { to: '/notes', label: 'Notes', requiresAuth: false },
   ]
 
   return links
@@ -85,8 +77,8 @@ onBeforeUnmount(() => {
         </button>
 
         <div v-if="menuOpen" class="menu-panel">
-          <!-- <template v-if="isLoggedIn">
-            <NuxtLink to="/account/v2"
+          <template>
+            <NuxtLink to="/account"
               class="w-full flex items-center rounded-xl px-3 py-2 text-sm text-black hover:bg-black/5 transition"
               @click="closeMenu">
               Account
@@ -107,15 +99,7 @@ onBeforeUnmount(() => {
                 Upgrade
               </span>
             </NuxtLink>
-
-            <div class="h-px my-2 bg-black/10"></div>
-
-            <button type="button"
-              class="w-full flex items-center rounded-xl px-3 py-2 text-sm text-red-700 hover:bg-red-500/10 transition"
-              @click="handleLogout">
-              Log out
-            </button>
-          </template> -->
+          </template>
 
           <!-- <template v-else>
             <button type="button"
@@ -128,14 +112,9 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <button
-      type="button"
-      class="trigger-visibility-btn"
-      :class="{ 'is-open': navOpen }"
-      :aria-label="navOpen ? 'Close Warp panel' : 'Open Warp panel'"
-      :aria-expanded="navOpen ? 'true' : 'false'" aria-controls="warp-navigation-panel"
-      @click.stop="toggleNav"
-    >
+    <button type="button" class="trigger-visibility-btn" :class="{ 'is-open': navOpen }"
+      :aria-label="navOpen ? 'Close Warp panel' : 'Open Warp panel'" :aria-expanded="navOpen ? 'true' : 'false'"
+      aria-controls="warp-navigation-panel" @click.stop="toggleNav">
       <span class="portal-swirl-line" aria-hidden="true"></span>
       <span class="sr-only">{{ navOpen ? 'Close Warp panel' : 'Open Warp panel' }}</span>
     </button>
@@ -151,14 +130,9 @@ onBeforeUnmount(() => {
         </div>
 
         <nav class="px-3 py-4 space-y-1">
-          <NuxtLink
-            v-for="link in navLinks"
-            :key="link.to"
-            :to="link.to"
-            class="drawer-link font-medium"
+          <NuxtLink v-for="link in navLinks" :key="link.to" :to="link.to" class="drawer-link font-medium"
             :class="{ 'drawer-link-active': route.path === link.to }"
-            :aria-current="route.path === link.to ? 'page' : undefined"
-          >
+            :aria-current="route.path === link.to ? 'page' : undefined">
             {{ link.label }}
           </NuxtLink>
         </nav>
@@ -323,7 +297,8 @@ onBeforeUnmount(() => {
 }
 
 @keyframes portalSwirl {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
 </style>
