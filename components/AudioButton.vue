@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 const props = withDefaults(defineProps<{
   src: string
   autoplay?: boolean
@@ -100,4 +100,4 @@ onBeforeUnmount(() => {
       Play
     </span>
   </button>
-</template>
+</template> -->

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { login, logout } from '@/composables/useAuth'
-import { useMeStateV2 } from '@/composables/useMeStateV2'
+// import { login, logout } from '@/composables/useAuth'
+// import { useMeStateV2 } from '@/composables/useMeStateV2'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-const { isLoggedIn, resolve } = useMeStateV2()
+// const { isLoggedIn, resolve } = useMeStateV2()
 const route = useRoute()
 
 const menuOpen = ref(false)
@@ -23,7 +23,7 @@ const navLinks = computed(() => {
     { to: '/dojo/topic', label: 'Topic Dojo', requiresAuth: false },
   ]
 
-  return links.filter(link => !link.requiresAuth || isLoggedIn.value)
+  return links
 })
 
 function toggleMenu() {
@@ -39,11 +39,11 @@ function toggleNav() {
 function closeNav() {
   navOpen.value = false
 }
-async function handleLogout() {
-  await logout()
-  await resolve({ force: true })
-  closeMenu()
-}
+// async function handleLogout() {
+//   await logout()
+//   await resolve({ force: true })
+//   closeMenu()
+// }
 
 function onDocumentClick(e: MouseEvent) {
   const target = e.target as Node | null
@@ -59,7 +59,7 @@ function onDocumentKeydown(e: KeyboardEvent) {
 }
 
 onMounted(() => {
-  resolve()
+  // resolve()
   document.addEventListener('click', onDocumentClick)
   document.addEventListener('keydown', onDocumentKeydown)
 })
@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
         </button>
 
         <div v-if="menuOpen" class="menu-panel">
-          <template v-if="isLoggedIn">
+          <!-- <template v-if="isLoggedIn">
             <NuxtLink to="/account/v2"
               class="w-full flex items-center rounded-xl px-3 py-2 text-sm text-black hover:bg-black/5 transition"
               @click="closeMenu">
@@ -115,15 +115,15 @@ onBeforeUnmount(() => {
               @click="handleLogout">
               Log out
             </button>
-          </template>
+          </template> -->
 
-          <template v-else>
+          <!-- <template v-else>
             <button type="button"
               class="w-full flex items-center rounded-xl px-3 py-2 text-sm text-gray-900 hover:bg-black/5 transition"
               @click="login()">
               Login
             </button>
-          </template>
+          </template> -->
         </div>
       </div>
     </div>
