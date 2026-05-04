@@ -101,7 +101,7 @@ onMounted(loadTasks)
     <div class="mt-6">
       <NuxtLink
         to="/tasks"
-        class="rounded bg-gray-900 px-4 py-2 text-white"
+        class="rounded bg-green-500 hover:brightness-110 px-4 py-2 text-black"
       >
         Go to tasks page
       </NuxtLink>

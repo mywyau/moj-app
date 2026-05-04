@@ -199,7 +199,7 @@ const getStatusClass = (status: Task['status']) => {
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label class="min-w-0 space-y-1">
           <span class="block text-sm font-medium text-gray-700">
-            Todo title
+            title
           </span>
 
           <input v-model="newTask.title" class="w-full min-w-0 rounded border px-3 py-2" placeholder="Todo title" />
@@ -224,7 +224,7 @@ const getStatusClass = (status: Task['status']) => {
       </label>
 
       <div class="flex flex-col gap-2 sm:flex-row">
-        <button class="w-full rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50 sm:w-auto" :disabled="saving"
+        <button class="w-full rounded bg-blue-600 hover:brightness-110 px-4 py-2 text-white disabled:opacity-50 sm:w-auto" :disabled="saving"
           @click="createTask">
           {{ saving ? 'Creating...' : 'Create todo' }}
         </button>
@@ -237,7 +237,8 @@ const getStatusClass = (status: Task['status']) => {
           All todos
         </h2>
 
-        <button class="w-full rounded bg-gray-900 px-3 py-2 text-white sm:w-auto sm:py-1" @click="loadTasks">
+        <button class="w-full rounded bg-green-600 hover:brightness-110 px-3 py-2 text-white sm:w-auto sm:py-1"
+          @click="loadTasks">
           Refresh
         </button>
       </div>
@@ -291,12 +292,13 @@ const getStatusClass = (status: Task['status']) => {
             </label>
 
             <div class="flex flex-col gap-2 sm:flex-row">
-              <button class="w-full rounded bg-green-600 px-3 py-2 text-white sm:w-auto sm:py-1"
+              <button class="w-full rounded bg-green-600 hover:brightness-110 px-3 py-2 text-white sm:w-auto sm:py-1"
                 @click="updateTask(task.id)">
                 Save
               </button>
 
-              <button class="w-full rounded bg-gray-500 px-3 py-2 text-white sm:w-auto sm:py-1" @click="cancelEditing">
+              <button class="w-full rounded bg-gray-500 hover:brightness-110 px-3 py-2 text-white sm:w-auto sm:py-1"
+                @click="cancelEditing">
                 Cancel
               </button>
             </div>
@@ -324,12 +326,12 @@ const getStatusClass = (status: Task['status']) => {
             </div>
 
             <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-              <button class="w-full rounded bg-gray-700 px-3 py-2 text-white sm:w-auto sm:py-1"
+              <button class="w-full rounded bg-gray-700 hover:brightness-110 px-3 py-2 text-white sm:w-auto sm:py-1"
                 @click="startEditing(task)">
                 Edit
               </button>
 
-              <button class="w-full rounded bg-red-600 px-3 py-2 text-white sm:w-auto sm:py-1"
+              <button class="w-full rounded bg-red-600 hover:brightness-110 px-3 py-2 text-white sm:w-auto sm:py-1"
                 @click="deleteTask(task.id)">
                 Delete
               </button>
