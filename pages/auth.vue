@@ -18,45 +18,18 @@ onMounted(async () => {
   await saveSession()
 })
 
-type ProfileUpsertPayload = {
-  id: string
-  email: string | null
-  full_name: string | null
-}
-
-const upsertProfile = async (userId: string, userEmail: string | null | undefined) => {
-  const payload: ProfileUpsertPayload = {
-    id: userId,
-    email: userEmail ?? null,
-    full_name: fullName.value || null
-  }
-
-  const { error } = await (supabase.from('profiles') as any).upsert(payload)
-
-  if (error) {
-    throw error
-  }
-}
-
 const signUp = async () => {
-  const { data, error } = await supabase.auth.signUp({ email: email.value, password: password.value })
-
-  if (error) {
-    message.value = error.message
-    return
-  }
-
-  try {
-    if (data.user && data.session) {
-      await upsertProfile(data.user.id, data.user.email)
-      message.value = 'Signed up successfully and profile created.'
-    } else {
-      message.value = 'Sign up request sent. Check your inbox if email confirmation is enabled.'
+  const { error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+    options: {
+      data: {
+        full_name: fullName.value || null
+      }
     }
-  } catch (profileError: any) {
-    message.value = `Signed up, but profile creation failed: ${profileError.message ?? 'Unknown error'}`
-  }
+  })
 
+  message.value = error ? error.message : 'Sign up request sent. Check your inbox if email confirmation is enabled.'
   await saveSession()
 }
 
