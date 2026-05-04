@@ -1,141 +1,189 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'Terms of Service · Ministry of Justice'
+  title: 'Terms of Use · MoJ Todo Exercise',
 })
+
+const lastUpdated = '4 May 2026'
 </script>
 
 <template>
-  <main class="max-w-3xl mx-auto px-4 py-16 space-y-10">
-
+  <main class="mx-auto max-w-3xl px-4 py-16 space-y-10">
     <BackLink />
 
     <header class="space-y-3">
       <h1 class="text-3xl font-semibold">
-        Terms of Service
+        Terms of Use
       </h1>
 
       <p class="text-sm text-gray-500">
-        Last updated: {{ new Date().toLocaleDateString() }}
+        Last updated: {{ lastUpdated }}
       </p>
     </header>
 
     <section class="space-y-4 text-gray-700">
       <p>
-        These Terms of Service (“Terms”) govern your use of Ministry of Justice.
-        By using the app, you agree to these Terms.
+        These terms explain how this MoJ Todo Exercise should be used. By using
+        the application, you agree to use it responsibly and only for its intended
+        purpose as a development exercise.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">1. About Ministry of Justice</h2>
+      <h2 class="text-xl font-semibold">
+        1. About this application
+      </h2>
+
       <p class="text-gray-700">
-        Ministry of Justice is a web application designed to help users learn Ministry of Justice
-        through vocabulary, audio, and exercises.
+        The MoJ Todo Exercise is a simple web application for creating, viewing,
+        editing and deleting todo items.
+      </p>
+
+      <p class="text-gray-700">
+        It is intended as a technical exercise and should not be treated as a live
+        Ministry of Justice production service.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">2. Accounts</h2>
+      <h2 class="text-xl font-semibold">
+        2. No authentication
+      </h2>
+
       <p class="text-gray-700">
-        To access certain features, you may need to create an account.
-        You are responsible for keeping your account secure and for any activity
-        that occurs under your account.
+        This version of the application does not require users to create an account
+        or sign in.
+      </p>
+
+      <p class="text-gray-700">
+        Because the application is authless, todo items are shared application data.
+        Anyone with access to the app may be able to view, update or delete todos.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">3. Subscriptions and payments</h2>
+      <h2 class="text-xl font-semibold">
+        3. Test data only
+      </h2>
+
       <p class="text-gray-700">
-        Some features of Ministry of Justice may require a paid subscription.
-        Payments are processed by third-party providers such as Stripe.
+        You should only enter test data into this application.
       </p>
 
       <p class="text-gray-700">
-        Subscription pricing, billing periods, and cancellation options will be
-        clearly shown before purchase. You may cancel your subscription at any time
-        according to the terms provided during checkout.
-      </p>
-    </section>
-
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold">4. Content and availability</h2>
-      <p class="text-gray-700">
-        The content provided on Ministry of Justice is for educational purposes only.
-        We may update, modify, or remove content at any time as the app evolves.
-      </p>
-
-      <p class="text-gray-700">
-        We do not guarantee that any particular content will always be available.
+        Do not enter real personal data, case information, confidential data,
+        operational Ministry of Justice data, security information or anything
+        sensitive.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">5. Acceptable use</h2>
+      <h2 class="text-xl font-semibold">
+        4. Acceptable use
+      </h2>
+
       <p class="text-gray-700">
-        You agree not to misuse the service, including attempting to:
+        You agree not to misuse the application, including attempting to:
       </p>
 
-      <ul class="list-disc pl-6 space-y-2 text-gray-700">
-        <li>Access restricted areas without permission</li>
-        <li>Distribute or resell content without authorisation</li>
-        <li>Interfere with the operation or security of the app</li>
+      <ul class="list-disc space-y-2 pl-6 text-gray-700">
+        <li>interfere with the operation of the application</li>
+        <li>submit malicious, harmful or unlawful content</li>
+        <li>attempt to access systems or data without permission</li>
+        <li>use the application to store real casework or confidential information</li>
+        <li>deliberately delete or alter data in a way that disrupts the exercise</li>
       </ul>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">6. Intellectual property</h2>
+      <h2 class="text-xl font-semibold">
+        5. Availability
+      </h2>
+
       <p class="text-gray-700">
-        All content on Ministry of Justice, including text, audio, and design, is owned by or
-        licensed to Ministry of Justice and is protected by intellectual property laws.
+        This application is provided for exercise and demonstration purposes. It may
+        be changed, reset, unavailable or removed at any time.
       </p>
 
       <p class="text-gray-700">
-        You may use the content for personal learning purposes only.
-      </p>
-    </section>
-
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold">7. No guarantees</h2>
-      <p class="text-gray-700">
-        Ministry of Justice is provided on an “as is” basis. While we aim to provide helpful and
-        accurate learning materials, we do not guarantee fluency or specific learning
-        outcomes.
+        Todo data may also be cleared from the database without notice.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">8. Limitation of liability</h2>
+      <h2 class="text-xl font-semibold">
+        6. No warranties
+      </h2>
+
       <p class="text-gray-700">
-        To the extent permitted by law, Ministry of Justice will not be liable for any indirect,
-        incidental, or consequential loss arising from your use of the app.
+        The application is provided as is. It may contain bugs, incomplete features
+        or temporary behaviour while it is being developed.
+      </p>
+
+      <p class="text-gray-700">
+        It should not be relied on for real task management, casework or operational
+        decisions.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">9. Termination</h2>
+      <h2 class="text-xl font-semibold">
+        7. Security
+      </h2>
+
       <p class="text-gray-700">
-        We may suspend or terminate access to the service if these Terms are violated
-        or if the app is discontinued.
+        This exercise does not currently include full production security controls
+        such as authentication, user-level permissions or audit logging.
+      </p>
+
+      <p class="text-gray-700">
+        Before this application is used in a real environment, appropriate security,
+        privacy and access controls should be added.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">10. Governing law</h2>
+      <h2 class="text-xl font-semibold">
+        8. Intellectual property
+      </h2>
+
       <p class="text-gray-700">
-        These Terms are governed by the laws of the UK.
+        The application code, design and content are provided for the purposes of
+        the exercise. They should not be reused, copied or distributed unless you
+        have permission to do so.
       </p>
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-xl font-semibold">11. Contact</h2>
+      <h2 class="text-xl font-semibold">
+        9. Changes to these terms
+      </h2>
+
       <p class="text-gray-700">
-        If you have any questions about these Terms, please contact:
+        These terms may be updated as the exercise application changes. The last
+        updated date above shows when this page was most recently changed.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">
+        10. Contact
+      </h2>
+
+      <p class="text-gray-700">
+        For this exercise, replace this contact address with the appropriate team,
+        service owner or assessor contact if required.
+      </p>
+
+      <p class="text-gray-700">
+        Example:
         <br />
-        <a href="mailto:contact@justice.gov.uk" class="font-medium">
-          contact@justice.gov.uk
+        <a
+          href="mailto:contact@example.com"
+          class="font-medium text-gray-900 hover:underline"
+        >
+          contact@example.com
         </a>
       </p>
     </section>
-
   </main>
 </template>

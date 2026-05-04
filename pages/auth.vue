@@ -1,4 +1,12 @@
 <script setup lang="ts">
+
+
+definePageMeta({
+  middleware: ['coming-soon'],
+  ssr: false
+})
+
+
 const email = ref('')
 const password = ref('')
 const fullName = ref('')

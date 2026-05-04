@@ -28,8 +28,8 @@ definePageMeta({
         Email
       </p>
 
-      <a href="mailto:contact@justice.gov.uk" class="email-link">
-        contact@justice.gov.uk
+      <a href="mailto:contact@moj.gov.uk" class="email-link">
+        contact@moj.gov.uk
       </a>
 
       <p class="text-xs text-gray-600">

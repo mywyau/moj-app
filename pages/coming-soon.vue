@@ -3,28 +3,10 @@ definePageMeta({
   title: 'Coming soon · Ministry of Justice'
 })
 
-// const goBack = () => {
-//   if (window.history.length > 1) {
-//     window.history.back()
-//   } else {
-//     navigateTo('/levels')
-//   }
-// }
-
 </script>
 
 <template>
-  <main class="max-w-xl mx-auto px-4 py-20 space-y-8 text-center">
-
-    <!-- <div class="text-left">
-      <button
-        type="button"
-        @click="goBack"
-        class="text-sm text-black hover:underline"
-      >
-        ← Back
-      </button>
-    </div> -->
+  <main class="max-w-xl mx-auto px-4 py-20 space-y-8 text-center">>
 
     <div class="text-left">
       <BackLink />
@@ -35,11 +17,7 @@ definePageMeta({
     </h1>
 
     <p class="text-gray-800">
-      Sit tight, new Ministry of Justice content and features are on the way.
-    </p>
-
-    <p class="text-sm text-gray-600 pt-4">
-      You can already explore some free content while we finish preparing and cooking up new features.
+      Sit tight, we're still working hard at the MOJ building out this service
     </p>
   </main>
 </template>
