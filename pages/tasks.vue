@@ -199,10 +199,10 @@ const getStatusClass = (status: Task['status']) => {
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label class="min-w-0 space-y-1">
           <span class="block text-sm font-medium text-gray-700">
-            title
+            Task title
           </span>
 
-          <input v-model="newTask.title" class="w-full min-w-0 rounded border px-3 py-2" placeholder="Todo title" />
+          <input v-model="newTask.title" class="w-full min-w-0 rounded border px-3 py-2" placeholder="Write the title of the task here" />
         </label>
 
         <label class="min-w-0 space-y-1">
@@ -253,11 +253,11 @@ const getStatusClass = (status: Task['status']) => {
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label class="min-w-0 space-y-1">
                 <span class="block text-sm font-medium text-gray-700">
-                  Todo title
+                  Task title
                 </span>
 
                 <input v-model="editTask.title" class="w-full min-w-0 rounded border px-3 py-2"
-                  placeholder="Todo title" />
+                  placeholder="Task Title" />
               </label>
 
               <label class="min-w-0 space-y-1">
