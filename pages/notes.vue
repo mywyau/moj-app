@@ -1,5 +1,11 @@
 
 <script setup lang="ts">
+
+definePageMeta({
+    middleware: ['coming-soon'],
+    ssr: false
+})
+
 interface Note {
   id: number
   title: string

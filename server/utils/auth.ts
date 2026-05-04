@@ -1,6 +1,21 @@
 import type { H3Event } from 'h3'
-import type { User } from '@supabase/supabase-js'
-import { getServerSupabase } from './supabase'
+import { createError, getHeader } from 'h3'
+import jwt from 'jsonwebtoken'
+import { db } from '~/server/db/db'
+
+export type AuthUser = {
+  id: string
+  email: string | null
+  role?: string | null
+}
+
+type SupabaseJwtPayload = {
+  sub: string
+  email?: string
+  role?: string
+  aud?: string
+  exp?: number
+}
 
 const getBearerToken = (event: H3Event) => {
   const authorization = getHeader(event, 'authorization')
@@ -8,22 +23,68 @@ const getBearerToken = (event: H3Event) => {
   if (!authorization?.startsWith('Bearer ')) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Missing or invalid Authorization header'
+      statusMessage: 'Missing or invalid Authorization header',
     })
   }
 
   return authorization.slice('Bearer '.length).trim()
 }
 
-export const requireUser = async (event: H3Event): Promise<User> => {
-  const token = getBearerToken(event)
-  const supabase = getServerSupabase()
+const verifySupabaseToken = (token: string): SupabaseJwtPayload => {
+  const jwtSecret = process.env.SUPABASE_JWT_SECRET
 
-  const { data, error } = await supabase.auth.getUser(token)
-
-  if (error || !data.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid or expired token' })
+  if (!jwtSecret) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Missing SUPABASE_JWT_SECRET',
+    })
   }
 
-  return data.user
+  try {
+    return jwt.verify(token, jwtSecret, {
+      algorithms: ['HS256'],
+      audience: 'authenticated',
+    }) as SupabaseJwtPayload
+  } catch {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Invalid or expired token',
+    })
+  }
+}
+
+export const requireUser = async (event: H3Event): Promise<AuthUser> => {
+  const token = getBearerToken(event)
+  const payload = verifySupabaseToken(token)
+
+  if (!payload.sub) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Invalid token payload',
+    })
+  }
+
+  const result = await db.query<AuthUser>(
+    `
+      select
+        id,
+        email,
+        role
+      from users
+      where id = $1
+      limit 1
+    `,
+    [payload.sub],
+  )
+
+  const user = result.rows[0]
+
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'User not found',
+    })
+  }
+
+  return user
 }
