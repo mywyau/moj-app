@@ -18,14 +18,20 @@ onMounted(async () => {
   await saveSession()
 })
 
+type ProfileUpsertPayload = {
+  id: string
+  email: string | null
+  full_name: string | null
+}
+
 const upsertProfile = async (userId: string, userEmail: string | null | undefined) => {
-  const { error } = await supabase
-    .from('profiles')
-    .upsert({
-      id: userId,
-      email: userEmail ?? null,
-      full_name: fullName.value || null
-    })
+  const payload: ProfileUpsertPayload = {
+    id: userId,
+    email: userEmail ?? null,
+    full_name: fullName.value || null
+  }
+
+  const { error } = await (supabase.from('profiles') as any).upsert(payload)
 
   if (error) {
     throw error
