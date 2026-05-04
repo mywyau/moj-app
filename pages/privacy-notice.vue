@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'Privacy Notice · TaroTea'
+  title: 'Privacy Notice · Ministry of Justice'
 })
 
 </script>
@@ -22,13 +22,13 @@ definePageMeta({
 
     <section class="space-y-4 text-gray-700">
       <p>
-        TaroTea (“we”, “us”, “our”) respects your privacy and is committed to protecting
+        Ministry of Justice (“we”, “us”, “our”) respects your privacy and is committed to protecting
         your personal data. This Privacy Notice explains how we collect, use, store and
-        protect your information when you use TaroTea.
+        protect your information when you use Ministry of Justice.
       </p>
 
       <p>
-        TaroTea is a web application for learning Cantonese. We only collect information
+        Ministry of Justice is a web application for learning Ministry of Justice. We only collect information
         that is needed to provide the service, manage accounts, process subscriptions,
         improve reliability, and support learning features.
       </p>
@@ -38,14 +38,14 @@ definePageMeta({
       <h2 class="text-xl font-semibold">1. Who we are</h2>
 
       <p class="text-gray-700">
-        TaroTea is operated as a Cantonese learning web application.
+        Ministry of Justice is operated as a Ministry of Justice learning web application.
       </p>
 
       <p class="text-gray-700">
         If you have any questions about this notice or your data, you can contact us at:
         <br />
-        <a href="mailto:contact@tarotea.co.uk" class="font-medium text-gray-900 hover:underline">
-          contact@tarotea.co.uk
+        <a href="mailto:contact@justice.gov.uk" class="font-medium text-gray-900 hover:underline">
+          contact@justice.gov.uk
         </a>
       </p>
     </section>
@@ -54,7 +54,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">2. What data we collect</h2>
 
       <p class="text-gray-700">
-        We collect different types of information depending on how you use TaroTea.
+        We collect different types of information depending on how you use Ministry of Justice.
       </p>
 
       <ul class="list-disc pl-6 space-y-2 text-gray-700">
@@ -123,7 +123,7 @@ definePageMeta({
 
       <ul class="list-disc pl-6 space-y-2 text-gray-700">
         <li>
-          <strong>Contract:</strong> to provide the TaroTea service you sign up for,
+          <strong>Contract:</strong> to provide the Ministry of Justice service you sign up for,
           including account access, paid features, learning progress and subscription
           management.
         </li>
@@ -149,7 +149,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">5. Third-party services</h2>
 
       <p class="text-gray-700">
-        We use trusted third-party providers to operate TaroTea. These providers only
+        We use trusted third-party providers to operate Ministry of Justice. These providers only
         process data as needed to provide their services to us.
       </p>
 
@@ -184,7 +184,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">6. Cookies and similar technologies</h2>
 
       <p class="text-gray-700">
-        TaroTea uses cookies and similar technologies to operate the app, keep users
+        Ministry of Justice uses cookies and similar technologies to operate the app, keep users
         signed in, remember preferences, and protect the service. We do not use advertising
         cookies.
       </p>
@@ -312,8 +312,8 @@ definePageMeta({
       <p class="text-gray-700">
         To exercise these rights, contact us at:
         <br />
-        <a href="mailto:contact@tarotea.co.uk" class="font-medium text-gray-900 hover:underline">
-          contact@tarotea.co.uk
+        <a href="mailto:contact@justice.gov.uk" class="font-medium text-gray-900 hover:underline">
+          contact@justice.gov.uk
         </a>
       </p>
     </section>
@@ -322,7 +322,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">9. Account deletion</h2>
 
       <p class="text-gray-700">
-        You may request deletion of your TaroTea account at any time. When an account is
+        You may request deletion of your Ministry of Justice account at any time. When an account is
         deleted, we aim to remove account information, learning progress and related app
         data from active systems, subject to any information we must keep for legal,
         billing, security or fraud-prevention reasons.
@@ -344,7 +344,7 @@ definePageMeta({
       <h2 class="text-xl font-semibold">11. Children</h2>
 
       <p class="text-gray-700">
-        TaroTea is not intended for children under 13. If you believe a child has provided
+        Ministry of Justice is not intended for children under 13. If you believe a child has provided
         us with personal data, please contact us so we can review and take appropriate
         action.
       </p>
@@ -376,8 +376,8 @@ definePageMeta({
       <p class="text-gray-700">
         If you have any questions about this Privacy Notice, please contact:
         <br />
-        <a href="mailto:contact@tarotea.co.uk" class="font-medium text-gray-900 hover:underline">
-          contact@tarotea.co.uk
+        <a href="mailto:contact@justice.gov.uk" class="font-medium text-gray-900 hover:underline">
+          contact@justice.gov.uk
         </a>
       </p>
     </section>

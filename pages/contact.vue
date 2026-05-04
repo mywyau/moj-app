@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'Contact · TaroTea'
+  title: 'Contact · Ministry of Justice'
 })
 </script>
 
@@ -28,8 +28,8 @@ definePageMeta({
         Email
       </p>
 
-      <a href="mailto:contact@tarotea.co.uk" class="email-link">
-        contact@tarotea.co.uk
+      <a href="mailto:contact@justice.gov.uk" class="email-link">
+        contact@justice.gov.uk
       </a>
 
       <p class="text-xs text-gray-600">

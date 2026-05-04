@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 definePageMeta({
-  title: 'Please sign in · TaroTea'
+  title: 'Please sign in · Ministry of Justice'
 })
 
 </script>

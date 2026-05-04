@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'Coming soon · TaroTea'
+  title: 'Coming soon · Ministry of Justice'
 })
 </script>
 
