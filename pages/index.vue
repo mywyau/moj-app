@@ -38,7 +38,7 @@ const serviceHighlights = [
       </h1>
 
       <p class="text-base sm:text-lg text-gray-700 mt-8 max-w-2xl mx-auto">
-        Welcome to the official Ministry of Justice portal. Use this site to access key services,
+        Welcome to the official Ministry of Justice internal platform. Use this site to access key services,
         practical guidance, and trusted information for the public and justice-sector professionals.
       </p>
     </section>
@@ -68,7 +68,8 @@ const serviceHighlights = [
       </h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <article v-for="mode in serviceHighlights" :key="mode.title" :class="mode.bgClass" class="rounded-xl p-5 shadow-sm">
+        <article v-for="mode in serviceHighlights" :key="mode.title" :class="mode.bgClass"
+          class="rounded-xl p-5 shadow-sm">
           <h3 class="font-semibold text-gray-900">
             {{ mode.title }}
           </h3>
