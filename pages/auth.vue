@@ -25,7 +25,7 @@ const signUp = async () => {
 
 const signIn = async () => {
   const { error } = await supabase.auth.signInWithPassword({ email: email.value, password: password.value })
-  message.value = error ? error.message : 'Signed in.'
+  message.value = error ? error.message : 'Signed in successfully.'
   await saveSession()
 }
 
@@ -33,14 +33,14 @@ const signOut = async () => {
   await supabase.auth.signOut()
   token.value = ''
   localStorage.removeItem('sb_access_token')
-  message.value = 'Signed out.'
+  message.value = 'Signed out successfully.'
 }
 </script>
 
 
 <template>
   <main class="mx-auto flex min-h-screen max-w-xl flex-col gap-6 p-8">
-    <h1 class="text-3xl font-bold">Auth</h1>
+    <h1 class="text-3xl font-bold">Ministry of Justice Account Access</h1>
 
     <div class="grid gap-3 rounded-lg border p-4">
       <input v-model="email" type="email" placeholder="Email" class="rounded border px-3 py-2" />
@@ -54,7 +54,7 @@ const signOut = async () => {
     </div>
 
     <div class="rounded-lg border p-4 text-sm">
-      <p class="font-semibold">Current access token</p>
+      <p class="font-semibold">Current session token</p>
       <p class="mt-2 break-all">{{ token || 'No session token yet.' }}</p>
       <p class="mt-2 text-gray-600">Token is also saved in localStorage as <code>sb_access_token</code>.</p>
     </div>
