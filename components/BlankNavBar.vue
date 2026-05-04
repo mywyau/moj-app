@@ -12,7 +12,10 @@ const menuRoot = ref<HTMLElement | null>(null)
 
 const navLinks = computed(() => {
   const links = [
+    { to: '/dashboard', label: 'Dashboard', requiresAuth: false },
+    { to: '/tasks', label: 'Tasks', requiresAuth: false },
     { to: '/notes', label: 'Notes', requiresAuth: false },
+
   ]
 
   return links
