@@ -3,6 +3,7 @@ const supabase = useSupabaseClient()
 
 const email = ref('')
 const password = ref('')
+const fullName = ref('')
 const message = ref('')
 const token = ref('')
 
@@ -18,7 +19,16 @@ onMounted(async () => {
 })
 
 const signUp = async () => {
-  const { error } = await supabase.auth.signUp({ email: email.value, password: password.value })
+  const { error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+    options: {
+      data: {
+        full_name: fullName.value || null
+      }
+    }
+  })
+
   message.value = error ? error.message : 'Sign up request sent. Check your inbox if email confirmation is enabled.'
   await saveSession()
 }
@@ -45,6 +55,7 @@ const signOut = async () => {
     <div class="grid gap-3 rounded-lg border p-4">
       <input v-model="email" type="email" placeholder="Email" class="rounded border px-3 py-2" />
       <input v-model="password" type="password" placeholder="Password" class="rounded border px-3 py-2" />
+      <input v-model="fullName" type="text" placeholder="Full name (optional)" class="rounded border px-3 py-2" />
       <div class="flex gap-2">
         <button class="rounded bg-black px-4 py-2 text-white" @click="signUp">Sign up</button>
         <button class="rounded bg-blue-600 px-4 py-2 text-white" @click="signIn">Sign in</button>
