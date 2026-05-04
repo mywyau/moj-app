@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-const supabase = useSupabaseBrowserClient()
+const supabase = useSupabaseClient()
 
 const email = ref('')
 const password = ref('')
