@@ -1,94 +1,105 @@
 # moj-app
 
-Nuxt 3 starter scaffold for a **Vercel + serverless** stack using:
-- Nuxt 3 / Nitro (Vercel preset)
-- Supabase (`@supabase/supabase-js`)
-- Upstash Redis (`@upstash/redis`)
-- Tailwind CSS
+A Nuxt 3 web app deployed with Nitro on Vercel, backed by Supabase auth/data and PostgreSQL-powered APIs.
 
-## 1) Quick start
+## Tech stack
 
-```bash
-npm install
-cp .env.example .env
-npm run dev
-```
+- **Framework:** Nuxt 3 + Vue 3 + TypeScript
+- **Styling:** Tailwind CSS
+- **Auth/Data:** Supabase (`@nuxtjs/supabase` + `@supabase/supabase-js`)
+- **Server APIs:** Nuxt server routes (`server/api/*`)
+- **Database:** PostgreSQL (`pg`) and Supabase
+- **Deployment target:** Vercel serverless (`nitro.preset = "vercel"`)
 
-Open `http://localhost:3000`.
+## Features currently in this repo
 
-## 2) Project structure
+- Public site pages (home, contact, legal pages, patch notes).
+- Auth entry flow (`/auth`, `/please-sign-in`).
+- App pages for tasks, notes, and dashboard.
+- Server API routes for:
+  - profile CRUD endpoints
+  - task CRUD endpoints
+  - notes CRUD endpoints
+  - signup and health endpoints
+- Shared utilities for Supabase auth/admin access and DB access.
+
+## Project structure
 
 ```txt
 .
-├── app/app.vue                     # landing page + health check
-├── lib/redis.ts
-├── server/api/health.get.ts        # starter serverless endpoint
-├── nuxt.config.ts                  # runtime config + vercel nitro preset
-└── .env.example
+├── app.vue
+├── components/                 # navigation, footer, shared UI pieces
+├── pages/                      # route pages
+├── middleware/                 # route guards / gating
+├── server/
+│   ├── api/                    # server API endpoints
+│   ├── db/                     # DB client setup
+│   └── utils/                  # auth + supabase server helpers
+├── lib/redis.ts                # Upstash Redis helper
+├── supabase/initial_schema.sql # base schema snapshot
+├── nuxt.config.ts
+└── package.json
 ```
 
-## 3) Environment variables
+## Getting started
 
-Copy `.env.example` and fill in:
+### 1) Install dependencies
 
-- `NUXT_PUBLIC_SUPABASE_URL`
-- `NUXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (server-only)
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
+```bash
+npm install
+```
 
-### Important
-- Anything under `NUXT_PUBLIC_*` is exposed to the browser.
-- Keep service-role and Upstash tokens server-only.
+### 2) Configure environment variables
 
-## 4) Supabase setup (recommended flow)
+Create a local env file (for example `.env`) and set the values used in `nuxt.config.ts`:
 
-1. Create a Supabase project.
-2. In **Project Settings → API**, copy:
-   - Project URL → `NUXT_PUBLIC_SUPABASE_URL`
-   - anon public key → `NUXT_PUBLIC_SUPABASE_ANON_KEY`
-   - service role key → `SUPABASE_SERVICE_ROLE_KEY`
-3. Create your first table (for example `profiles`) and enable RLS.
-4. Write policies before production use.
+```bash
+# Supabase (client + server)
+NUXT_PUBLIC_SUPABASE_URL=
+NUXT_PUBLIC_SUPABASE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_JWT_SECRET=
 
-## 5) Upstash setup
+# Database
+DATABASE_URL=
 
-1. Create a Redis database in Upstash.
-2. Copy `REST URL` and `REST TOKEN` into:
-   - `UPSTASH_REDIS_REST_URL`
-   - `UPSTASH_REDIS_REST_TOKEN`
+# Optional Redis
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+```
 
-## 6) Vercel deployment
+> Note: `NUXT_PUBLIC_*` variables are exposed to the browser. Keep service-role keys and secrets server-only.
 
-1. Push this repo to GitHub/GitLab/Bitbucket.
-2. Import into Vercel.
-3. In Vercel project settings, add all environment variables from `.env.example`.
-4. Build command: `npm run build`.
-5. Output is handled by Nuxt/Nitro automatically.
-
-Because `nitro.preset = 'vercel'`, API routes under `server/api` deploy as serverless functions.
-
-## 7) Next steps to build features
-
-- Add auth pages (`/login`, `/signup`) using Supabase auth.
-- Add a server route using `SUPABASE_SERVICE_ROLE_KEY` for privileged writes.
-- Add caching/rate limiting with Upstash in API handlers.
-- Add Zod validation for all request payloads.
-- Add observability (Vercel logs + Sentry).
-
-## 8) Helpful commands
+### 3) Run locally
 
 ```bash
 npm run dev
-npm run build
-npm run preview
 ```
 
-## 9) Database schema (saved)
+App runs by default at `http://localhost:3000`.
 
-The initial Supabase schema is saved at:
+## Available scripts
+
+```bash
+npm run dev      # start dev server
+npm run build    # production build
+npm run preview  # preview production build locally
+```
+
+## Database schema
+
+A starter schema is included at:
 
 - `supabase/initial_schema.sql`
 
-You can run it in the Supabase SQL Editor to recreate tables/policies consistently.
+Use this file in the Supabase SQL editor (or your migration workflow) to initialize baseline tables/policies.
 
+## Deployment notes (Vercel)
+
+- This project is configured with `nitro.preset = "vercel"`.
+- Nuxt server routes under `server/api` are deployed as serverless functions.
+- Add all required environment variables in your Vercel project settings before deploy.
+
+## License
+
+MIT — see [`LICENSE`](./LICENSE).
