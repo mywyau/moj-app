@@ -67,22 +67,6 @@ UPSTASH_REDIS_REST_TOKEN=
 
 > Note: `NUXT_PUBLIC_*` variables are exposed to the browser. Keep service-role keys and secrets server-only.
 
-### 3) Run locally
-
-```bash
-npm run dev
-```
-
-App runs by default at `http://localhost:3000`.
-
-## Available scripts
-
-```bash
-npm run dev      # start dev server
-npm run build    # production build
-npm run preview  # preview production build locally
-```
-
 ## Database schema
 
 A starter schema is included at:
